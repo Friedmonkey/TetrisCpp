@@ -2,6 +2,7 @@
 #include "settings.h"
 
 #include "Grid.h"
+#include "Blocks.cpp"
 
 int main()
 {
@@ -10,9 +11,7 @@ int main()
 	SetTargetFPS(60);
 
 	Grid grid = Grid();
-	grid.grid[0][0] = 1;
-	grid.grid[3][5] = 4;
-	grid.grid[17][8] = 7;
+	LBlock block = LBlock();
 	grid.Print();
 
 	while (!WindowShouldClose())
@@ -26,6 +25,7 @@ int main()
 		ClearBackground(DARKBLUE);
 		//DrawText("Hello world", 10, SH2, 40, RAYWHITE);
 		grid.Draw();
+		block.Draw();
 
 		EndDrawing();
 	}

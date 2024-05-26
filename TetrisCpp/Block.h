@@ -1,5 +1,6 @@
 #pragma once
-#include <Vector>
+#include "Settings.h"
+
 #include <Map>
 #include "Position.h"
 
@@ -7,10 +8,11 @@ class Block
 {
 public:
 	Block();
+	void Draw();
 	int id;
 	std::map<int, std::vector<Position>> cells;
 private:
-	int cellsize;
 	int rotationState;
+	std::vector<Color> colors;
 };
 
