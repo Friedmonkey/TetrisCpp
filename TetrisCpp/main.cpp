@@ -1,8 +1,7 @@
 #include <iostream>
 #include "settings.h"
 
-#include "Grid.h"
-#include "Blocks.cpp"
+#include "Game.h"
 
 int main()
 {
@@ -10,11 +9,7 @@ int main()
 	InitWindow(SW, SH, "Tetris game lol");
 	SetTargetFPS(60);
 
-	Grid grid = Grid();
-	grid.Print();
-
-
-	IBlock block = IBlock();
+	Game game = Game();
 
 
 	while (!WindowShouldClose())
@@ -22,13 +17,12 @@ int main()
 		BeginDrawing();
 
 		// updating
-
+		game.HandleInput();
 
 		// drawing
 		ClearBackground(DARKBLUE);
 		//DrawText("Hello world", 10, SH2, 40, RAYWHITE);
-		grid.Draw();
-		block.Draw();
+		game.Draw();
 
 		EndDrawing();
 	}
