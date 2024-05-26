@@ -1,7 +1,6 @@
 #include <iostream>
-#include <raylib.h>
-
 #include "settings.h"
+
 #include "Grid.h"
 
 int main()
