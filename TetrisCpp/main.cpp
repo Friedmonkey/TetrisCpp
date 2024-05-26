@@ -22,7 +22,8 @@ int main()
 
 		// drawing
 		ClearBackground(DARKBLUE);
-		DrawText("Hello world", 10, SH2, 40, RAYWHITE);
+		//DrawText("Hello world", 10, SH2, 40, RAYWHITE);
+		grid.Draw();
 
 		EndDrawing();
 	}
