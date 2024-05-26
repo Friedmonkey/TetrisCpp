@@ -11,7 +11,7 @@ int main()
 	SetTargetFPS(60);
 
 	Grid grid = Grid();
-	LBlock block = LBlock();
+	TBlock block = TBlock();
 	grid.Print();
 
 	while (!WindowShouldClose())
