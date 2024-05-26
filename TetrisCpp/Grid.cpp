@@ -28,7 +28,7 @@ void Grid::Draw()
 		for (size_t c = 0; c < Columns; c++)
 		{
 			int cellValue = grid[r][c];
-			DrawRectangle(c*CellSize, r*CellSize, CellSize, CellSize, colors[cellValue]);
+			DrawRectangle(c*CellSize+GapSize, r*CellSize+GapSize, CellSize-GapSize, CellSize-GapSize, colors[cellValue]);
 		}
 	}
 }
