@@ -7,6 +7,7 @@
 #define Columns 10
 
 #define GapSize 3
+#define OffSet 10
 
 #define CellSize 35
 

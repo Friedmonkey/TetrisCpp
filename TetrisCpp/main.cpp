@@ -20,7 +20,8 @@ bool EventTriggerd(double interval)
 int main()
 {
 	std::cout << "Hello world!" << std::endl;
-	InitWindow(SW, SH, "Tetris game lol");
+
+	InitWindow(SW+200, SH+20, "Tetris game lol");
 	SetTargetFPS(60);
 
 	Game game = Game();

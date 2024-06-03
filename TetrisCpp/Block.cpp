@@ -16,8 +16,8 @@ void Block::Draw()
 	for (Position item: tiles)
 	{
 		DrawRectangle(
-			item.column*CellSize+GapSize, 
-			item.row*CellSize+GapSize, 
+			item.column*CellSize+GapSize+OffSet, 
+			item.row*CellSize+GapSize+OffSet,
 			CellSize-GapSize, 
 			CellSize-GapSize, 
 			colors[id]
