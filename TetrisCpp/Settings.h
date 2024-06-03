@@ -16,6 +16,7 @@
 
 
 
+#define LIGHTBLUE Color {59, 85, 162, 255}
 #define DARKBLUE Color {44, 44, 127, 255}
 
 #define darkGrey Color { 26, 31, 40, 255 }
