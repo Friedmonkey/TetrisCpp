@@ -51,7 +51,9 @@ int main()
 		DrawRectangleRounded(rect, 0.3, 6, LIGHTBLUE);
 
 		//Score value
-		DrawTextEx(font, "420", {Columns * (CellSize + GapSize), 80}, 25, 2, WHITE);
+		char scoreText[10];
+		sprintf_s(scoreText, "%i",game.score);
+		DrawTextEx(font, scoreText, {Columns * (CellSize + GapSize), 80}, 25, 2, WHITE);
 
 		//Next text
 		DrawTextEx(font, "Next", { Columns * (CellSize + GapSize), 130 }, 25, 2, WHITE);
@@ -60,8 +62,11 @@ int main()
 		Rectangle rect2 = Rectangle{ Columns * (CellSize + GapSize) - GapSize, 160, 170, 150 };
 		DrawRectangleRounded(rect2, 0.3, 6, LIGHTBLUE);
 
-		//Gameover text
-		DrawTextEx(font, "Game over", { Columns * (CellSize + GapSize), 325 }, 25, 2, WHITE);
+		if (game.gameOver)
+		{
+			//Gameover text
+			DrawTextEx(font, "Game over", { Columns * (CellSize + GapSize), 325 }, 25, 2, WHITE);
+		}
 
 
 		game.Draw();

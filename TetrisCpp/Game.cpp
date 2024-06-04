@@ -30,7 +30,19 @@ std::vector<Block> Game::GetAllBlocks()
 void Game::Draw()
 {
 	grid.Draw();
-	currentBlock.Draw();
+	currentBlock.Draw(0,0);
+	switch (nextBlock.id)
+	{
+	case 3: //i block
+		nextBlock.Draw( ((Columns-2)*CellSize)-5, (6*CellSize)-5);
+		break;
+	case 4: //o block
+		nextBlock.Draw( ((Columns-2)*CellSize)-5, (5*CellSize)+10);
+		break;
+	default:
+		nextBlock.Draw( ((Columns-2)*CellSize)+10, (5*CellSize)+10);
+		break;
+	}
 }
 
 void Game::HandleInput()
@@ -52,6 +64,7 @@ void Game::HandleInput()
 		MoveBlockRight();
 		break;
 	case KEY_DOWN:
+		UpdateScore(0,1);
 		MoveBlockDown();
 		break;
 
@@ -161,7 +174,8 @@ void Game::LockBlock()
 	}
 	nextBlock = GetRandomBlock();
 
-	grid.ClearFullRows();
+	int rowsCleared = grid.ClearFullRows();
+	UpdateScore(rowsCleared,0);
 }
 
 bool Game::BlockFits()
@@ -184,4 +198,26 @@ void Game::Reset()
 	blocks = GetAllBlocks();
 	currentBlock = GetRandomBlock();
 	nextBlock = GetRandomBlock();
+	score = 0;
+}
+
+void Game::UpdateScore(int linesCleared, int moveDownPoints)
+{
+	switch (linesCleared)
+	{
+	case 1:
+		score += 100;
+		break;
+	case 2:
+		score += 300;
+		break;
+	case 3:
+		score += 500;
+		break;
+
+	default:
+		break;
+	}
+
+	score += moveDownPoints;
 }
