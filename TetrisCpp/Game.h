@@ -37,5 +37,7 @@ private:
 
 	Sound rotateSound;
 	Sound clearSound;
+	Sound loseSound;
+	Sound winSound;
 };
 

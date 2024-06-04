@@ -14,12 +14,16 @@ Game::Game()
 
 	rotateSound = LoadSound("Assets/Audio/rotate.wav");
 	clearSound = LoadSound("Assets/Audio/clear.wav");
+	loseSound = LoadSound("Assets/Audio/lose.wav");
+	winSound = LoadSound("Assets/Audio/win.wav");
 }
 
 Game::~Game()
 {
 	UnloadSound(rotateSound);
 	UnloadSound(clearSound);
+	UnloadSound(loseSound);
+	UnloadSound(winSound);
 	UnloadMusicStream(music);
 	CloseAudioDevice();
 }
@@ -109,10 +113,10 @@ void Game::HandleInput()
 	case KEY_RIGHT:
 		MoveBlockRight();
 		break;
-	case KEY_DOWN:
-		UpdateScore(0,1);
-		MoveBlockDown();
-		break;
+	//case KEY_DOWN:
+	//	UpdateScore(0,1);
+	//	MoveBlockDown();
+	//	break;
 
 	case KEY_Q:
 		RotateLeft();
@@ -226,12 +230,18 @@ void Game::LockBlock()
 	{
 		gameOver = true;
 		StopMusicStream(music);
+		PlaySound(loseSound);
 	}
 	nextBlock = GetRandomBlock();
 
 	int rowsCleared = grid.ClearFullRows();
 	UpdateScore(rowsCleared,0);
-	if (rowsCleared > 0)
+	if (rowsCleared > 2)
+	{
+		PlaySound(winSound);
+		PlaySound(clearSound);
+	}
+	else if (rowsCleared > 0)
 	{
 		PlaySound(clearSound);
 	}
@@ -274,7 +284,9 @@ void Game::UpdateScore(int linesCleared, int moveDownPoints)
 	case 3:
 		score += 500;
 		break;
-
+	case 4:
+		score += 1000;
+		break;
 	default:
 		break;
 	}
