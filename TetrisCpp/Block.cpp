@@ -15,11 +15,30 @@ void Block::Draw(int offsetX, int offsetY)
 	std::vector<Position> tiles = GetCellPositions();
 	for (Position item: tiles)
 	{
+		if (item.row < BufferRows)
+		{
+			continue;
+		}
 		DrawRectangle(
-			item.column*CellSize+GapSize+OffSet+offsetX, 
-			item.row*CellSize+GapSize+OffSet+offsetY,
+			item.column*CellSize+GapSize+OffSet, 
+			(item.row-BufferRows)*CellSize+GapSize+OffSet,
 			CellSize-GapSize, 
 			CellSize-GapSize, 
+			colors[id]
+		);
+	}
+}
+
+void Block::DrawUI(int offsetX, int offsetY)
+{
+	std::vector<Position> tiles = GetCellPositions();
+	for (Position item : tiles)
+	{
+		DrawRectangle(
+			item.column * CellSize + GapSize + OffSet + offsetX,
+			item.row * CellSize + GapSize + OffSet + offsetY,
+			CellSize - GapSize,
+			CellSize - GapSize,
 			colors[id]
 		);
 	}

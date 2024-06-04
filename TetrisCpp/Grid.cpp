@@ -9,12 +9,12 @@ Grid::Grid()
 
 void Grid::Draw()
 {
-	for (size_t r = 0; r < Rows; r++)
+	for (size_t r = BufferRows; r < Rows; r++)
 	{
 		for (size_t c = 0; c < Columns; c++)
 		{
 			int cellValue = grid[r][c];
-			DrawRectangle(c*CellSize+GapSize+OffSet, r*CellSize+GapSize+OffSet, CellSize-GapSize, CellSize-GapSize, colors[cellValue]);
+			DrawRectangle(c*CellSize+GapSize+OffSet, (r-BufferRows)*CellSize+GapSize+OffSet, CellSize-GapSize, CellSize-GapSize, colors[cellValue]);
 		}
 	}
 }

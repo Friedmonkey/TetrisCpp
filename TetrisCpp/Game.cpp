@@ -48,13 +48,13 @@ void Game::Draw()
 	switch (nextBlock.id)
 	{
 	case 3: //i block
-		nextBlock.Draw( ((Columns-2)*CellSize)-5, (6*CellSize)-5);
+		nextBlock.DrawUI( ((Columns-2)*CellSize)-5, (6*CellSize)-5);
 		break;
 	case 4: //o block
-		nextBlock.Draw( ((Columns-2)*CellSize)-5, (5*CellSize)+10);
+		nextBlock.DrawUI( ((Columns-2)*CellSize)-5, (5*CellSize)+10);
 		break;
 	default:
-		nextBlock.Draw( ((Columns-2)*CellSize)+10, (5*CellSize)+10);
+		nextBlock.DrawUI( ((Columns-2)*CellSize)+10, (5*CellSize)+10);
 		break;
 	}
 }

@@ -3,7 +3,8 @@
 #include <Vector>
 #include <Raylib.h>
 
-#define Rows 20
+#define BufferRows 2
+#define Rows (20 + BufferRows)
 #define Columns 10
 
 #define GapSize 3
@@ -12,7 +13,7 @@
 #define CellSize 35
 
 #define SW Columns*CellSize+GapSize
-#define SH Rows*CellSize+GapSize
+#define SH (Rows-BufferRows)*CellSize+GapSize
 
 
 
