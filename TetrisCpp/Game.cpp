@@ -7,6 +7,7 @@ Game::Game()
 	gameOver = false;
 	blocks = GetAllBlocks();
 	currentBlock = GetRandomBlock();
+	ApplyShadow();
 	nextBlock = GetRandomBlock();
 	InitAudioDevice();
 	music = LoadMusicStream("Assets/Audio/Tetris.mp3");
@@ -16,6 +17,10 @@ Game::Game()
 	clearSound = LoadSound("Assets/Audio/clear.wav");
 	loseSound = LoadSound("Assets/Audio/lose.wav");
 	winSound = LoadSound("Assets/Audio/win.wav");
+	dropSound = LoadSound("Assets/Audio/drop.wav");
+	lockSound = LoadSound("Assets/Audio/lock.wav");
+	cantSound = LoadSound("Assets/Audio/cant.wav");
+	clickSound = LoadSound("Assets/Audio/click.wav");
 }
 
 Game::~Game()
@@ -24,8 +29,33 @@ Game::~Game()
 	UnloadSound(clearSound);
 	UnloadSound(loseSound);
 	UnloadSound(winSound);
+	UnloadSound(dropSound);
+	UnloadSound(lockSound);
+	UnloadSound(cantSound);
+	UnloadSound(clickSound);
 	UnloadMusicStream(music);
 	CloseAudioDevice();
+}
+
+void Game::ApplyShadow()
+{
+	currentBlockShadow = Block(currentBlock);
+	currentBlockShadow.id += 8;
+	DropShadow();
+}
+
+void Game::DropShadow()
+{
+	currentBlockShadow.rowOffset = currentBlock.rowOffset;
+	currentBlockShadow.colummnOffset = currentBlock.colummnOffset;
+
+
+	while (!IsBlockOutside(&currentBlockShadow) && BlockFits(&currentBlockShadow))
+	{
+		currentBlockShadow.Move(1, 0);
+	}
+
+	currentBlockShadow.Move(-1, 0);
 }
 
 Block Game::GetRandomBlock()
@@ -49,6 +79,7 @@ void Game::Draw()
 {
 	grid.Draw();
 	currentBlock.Draw(0,0);
+	currentBlockShadow.Draw(0,0);
 	switch (nextBlock.id)
 	{
 	case 3: //i block
@@ -69,21 +100,24 @@ void Game::HandleMovement()
 	{
 		return;
 	}
-	if (IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL))
+	if (IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL) || IsKeyDown(KEY_RIGHT_SHIFT) || IsKeyDown(KEY_LEFT_SHIFT))
 	{
 		if (IsKeyDown(KEY_LEFT))
 		{
 			MoveBlockLeft();
+			PlaySound(clickSound);
 		}
 		if (IsKeyDown(KEY_RIGHT))
 		{
 			MoveBlockRight();
+			PlaySound(clickSound);
 		}
 	}
 	if (IsKeyDown(KEY_DOWN))
 	{
 		UpdateScore(0, 1);
 		MoveBlockDown();
+		PlaySound(clickSound);
 	}
 }
 
@@ -95,7 +129,7 @@ void Game::HandleInput()
 	{
 		paused = !paused;
 	}
-	if (keyPressed == KEY_R)
+	if (keyPressed == KEY_U)
 	{
 		Reset();
 	}
@@ -117,11 +151,15 @@ void Game::HandleInput()
 	//	UpdateScore(0,1);
 	//	MoveBlockDown();
 	//	break;
+	case KEY_SPACE:
+		DropBlockDown();
+		break;
 
 	case KEY_Q:
 		RotateLeft();
 		break;
 	case KEY_E:
+	case KEY_UP:
 		RotateRight();
 		break;
 
@@ -130,16 +168,23 @@ void Game::HandleInput()
 	}
 }
 
+void Game::Move(int rows, int columns)
+{
+	currentBlock.Move(rows, columns);
+	DropShadow();
+}
+
 void Game::MoveBlockLeft()
 {
 	if (gameOver || paused)
 	{
 		return;
 	}
-	currentBlock.Move(0, -1);
-	if (IsBlockOutside() || !BlockFits())
+	Move(0, -1);
+	if (IsBlockOutside(&currentBlock) || !BlockFits(&currentBlock))
 	{
-		currentBlock.Move(0, 1);
+		Move(0, 1);
+		PlaySound(cantSound);
 	}
 }
 
@@ -149,11 +194,28 @@ void Game::MoveBlockRight()
 	{
 		return;
 	}
-	currentBlock.Move(0, 1);
-	if (IsBlockOutside() || !BlockFits())
+	Move(0, 1);
+	if (IsBlockOutside(&currentBlock) || !BlockFits(&currentBlock))
 	{
-		currentBlock.Move(0, -1);
+		Move(0, -1);
+		PlaySound(cantSound);
 	}
+}
+
+void Game::DropBlockDown()
+{
+	if (gameOver || paused)
+	{
+		return;
+	}
+	DropShadow();
+
+	int dropDistance = currentBlockShadow.rowOffset - currentBlock.rowOffset;
+
+	PlaySound(dropSound);
+	currentBlock.rowOffset = currentBlockShadow.rowOffset;
+	
+	UpdateScore(0, dropDistance * 2);
 }
 
 void Game::MoveBlockDown()
@@ -162,10 +224,10 @@ void Game::MoveBlockDown()
 	{
 		return;
 	}
-	currentBlock.Move(1, 0);
-	if (IsBlockOutside() || !BlockFits())
+	Move(1, 0);
+	if (IsBlockOutside(&currentBlock) || !BlockFits(&currentBlock))
 	{
-		currentBlock.Move(-1, 0);
+		Move(-1, 0);
 		LockBlock();
 	}
 }
@@ -177,13 +239,16 @@ void Game::RotateLeft()
 		return;
 	}
 	currentBlock.RotateLeft();
-	if (IsBlockOutside() || !BlockFits())
+	if (IsBlockOutside(&currentBlock) || !BlockFits(&currentBlock))
 	{
 		currentBlock.RotateRight();
+		PlaySound(cantSound);
 	}
 	else
 	{
 		PlaySound(rotateSound);
+		currentBlockShadow.RotateLeft();
+		DropShadow();
 	}
 }
 
@@ -194,28 +259,19 @@ void Game::RotateRight()
 		return;
 	}
 	currentBlock.RotateRight();
-	if (IsBlockOutside() || !BlockFits())
+	if (IsBlockOutside(&currentBlock) || !BlockFits(&currentBlock))
 	{
 		currentBlock.RotateLeft();
+		PlaySound(cantSound);
 	}
 	else
 	{
 		PlaySound(rotateSound);
+		currentBlockShadow.RotateRight();
+		DropShadow();
 	}
 }
 
-bool Game::IsBlockOutside()
-{
-	std::vector<Position> tiles = currentBlock.GetCellPositions();
-	for (Position item: tiles)
-	{
-		if (grid.IsCellOutside(item.row, item.column))
-		{
-			return true;
-		}
-	}
-	return false;
-}
 
 void Game::LockBlock()
 {
@@ -226,12 +282,14 @@ void Game::LockBlock()
 	}
 
 	currentBlock = nextBlock;
-	if (!BlockFits())
+	ApplyShadow();
+	if (!BlockFits(&currentBlock))
 	{
 		gameOver = true;
 		StopMusicStream(music);
 		PlaySound(loseSound);
 	}
+	PlaySound(lockSound);
 	nextBlock = GetRandomBlock();
 
 	int rowsCleared = grid.ClearFullRows();
@@ -247,9 +305,22 @@ void Game::LockBlock()
 	}
 }
 
-bool Game::BlockFits()
+bool Game::IsBlockOutside(Block* pBlock)
 {
-	std::vector<Position> tiles = currentBlock.GetCellPositions();
+	std::vector<Position> tiles = pBlock->GetCellPositions();
+	for (Position item : tiles)
+	{
+		if (grid.IsCellOutside(item.row, item.column))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+bool Game::BlockFits(Block *pBlock)
+{
+	std::vector<Position> tiles = pBlock->GetCellPositions();
 	for (Position item : tiles)
 	{
 		if (!grid.IsCellEmpty(item.row, item.column))
@@ -264,6 +335,7 @@ void Game::Reset()
 {
 	grid.Initialize();
 	gameOver = false;
+	paused = false;
 	blocks = GetAllBlocks();
 	currentBlock = GetRandomBlock();
 	nextBlock = GetRandomBlock();

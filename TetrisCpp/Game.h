@@ -11,6 +11,7 @@ public:
 	void HandleInput();
 	void HandleMovement();
 	void MoveBlockDown();
+	void DropBlockDown();
 	void RotateLeft();
 	void RotateRight();
 	bool gameOver;
@@ -24,20 +25,30 @@ private:
 	void MoveBlockLeft();
 	void MoveBlockRight();
 
-	bool IsBlockOutside();
+	void Move(int rows, int columns);
+
+	bool IsBlockOutside(Block* pBlock);
+	bool BlockFits(Block* pBlock);
 	void LockBlock();
-	bool BlockFits();
 	void Reset();
 	void UpdateScore(int linesCleared, int moveDownPoints);
+	void ApplyShadow();
+
+	void DropShadow();
 
 	Grid grid;
 	std::vector<Block> blocks;
 	Block currentBlock;
+	Block currentBlockShadow;
 	Block nextBlock;
 
 	Sound rotateSound;
 	Sound clearSound;
 	Sound loseSound;
 	Sound winSound;
+	Sound dropSound;
+	Sound lockSound;
+	Sound cantSound;
+	Sound clickSound;
 };
 

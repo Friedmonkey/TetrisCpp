@@ -17,10 +17,10 @@ public:
 	int id;
 	std::map<int, std::vector<Position>> cells;
 
+	int rowOffset;
+	int colummnOffset;
 private:
 	int rotationState;
 	std::vector<Color> colors;
-	int rowOffset;
-	int colummnOffset;
 };
 

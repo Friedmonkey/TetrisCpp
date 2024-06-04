@@ -87,7 +87,7 @@ int main()
 		{
 			//Gameover text
 			DrawTextEx(font, "Game over", { sidepanel, 325 }, 25, 2, WHITE);
-			DrawTextEx(font, "Press \"R\"", { sidepanel, 350 }, 25, 2, WHITE);
+			DrawTextEx(font, "Press \"U\"", { sidepanel, 350 }, 25, 2, WHITE);
 			DrawTextEx(font, "to restart", { sidepanel, 375 }, 25, 2, WHITE);
 		}
 
