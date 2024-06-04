@@ -8,6 +8,20 @@ Game::Game()
 	blocks = GetAllBlocks();
 	currentBlock = GetRandomBlock();
 	nextBlock = GetRandomBlock();
+	InitAudioDevice();
+	music = LoadMusicStream("Assets/Audio/Tetris.mp3");
+	PlayMusicStream(music);
+
+	rotateSound = LoadSound("Assets/Audio/rotate.wav");
+	clearSound = LoadSound("Assets/Audio/clear.wav");
+}
+
+Game::~Game()
+{
+	UnloadSound(rotateSound);
+	UnloadSound(clearSound);
+	UnloadMusicStream(music);
+	CloseAudioDevice();
 }
 
 Block Game::GetRandomBlock()
@@ -49,10 +63,18 @@ void Game::HandleInput()
 {
 	int keyPressed = GetKeyPressed();
 
-	if (gameOver && keyPressed != 0)
+	if (keyPressed == KEY_P)
 	{
-		gameOver = false;
+		paused = !paused;
+	}
+	if (keyPressed == KEY_R)
+	{
 		Reset();
+	}
+
+	if (gameOver || paused)
+	{
+		return;
 	}
 
 	switch (keyPressed)
@@ -82,7 +104,7 @@ void Game::HandleInput()
 
 void Game::MoveBlockLeft()
 {
-	if (gameOver)
+	if (gameOver || paused)
 	{
 		return;
 	}
@@ -95,7 +117,7 @@ void Game::MoveBlockLeft()
 
 void Game::MoveBlockRight()
 {
-	if (gameOver)
+	if (gameOver || paused)
 	{
 		return;
 	}
@@ -108,7 +130,7 @@ void Game::MoveBlockRight()
 
 void Game::MoveBlockDown()
 {
-	if (gameOver)
+	if (gameOver || paused)
 	{
 		return;
 	}
@@ -122,7 +144,7 @@ void Game::MoveBlockDown()
 
 void Game::RotateLeft()
 {
-	if (gameOver)
+	if (gameOver || paused)
 	{
 		return;
 	}
@@ -131,11 +153,15 @@ void Game::RotateLeft()
 	{
 		currentBlock.RotateRight();
 	}
+	else
+	{
+		PlaySound(rotateSound);
+	}
 }
 
 void Game::RotateRight()
 {
-	if (gameOver)
+	if (gameOver || paused)
 	{
 		return;
 	}
@@ -143,6 +169,10 @@ void Game::RotateRight()
 	if (IsBlockOutside() || !BlockFits())
 	{
 		currentBlock.RotateLeft();
+	}
+	else
+	{
+		PlaySound(rotateSound);
 	}
 }
 
@@ -171,11 +201,16 @@ void Game::LockBlock()
 	if (!BlockFits())
 	{
 		gameOver = true;
+		StopMusicStream(music);
 	}
 	nextBlock = GetRandomBlock();
 
 	int rowsCleared = grid.ClearFullRows();
 	UpdateScore(rowsCleared,0);
+	if (rowsCleared > 0)
+	{
+		PlaySound(clearSound);
+	}
 }
 
 bool Game::BlockFits()
@@ -199,6 +234,7 @@ void Game::Reset()
 	currentBlock = GetRandomBlock();
 	nextBlock = GetRandomBlock();
 	score = 0;
+	PlayMusicStream(music);
 }
 
 void Game::UpdateScore(int linesCleared, int moveDownPoints)
