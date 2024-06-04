@@ -59,6 +59,30 @@ void Game::Draw()
 	}
 }
 
+void Game::HandleMovement()
+{
+	if (gameOver || paused)
+	{
+		return;
+	}
+	if (IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL))
+	{
+		if (IsKeyDown(KEY_LEFT))
+		{
+			MoveBlockLeft();
+		}
+		if (IsKeyDown(KEY_RIGHT))
+		{
+			MoveBlockRight();
+		}
+	}
+	if (IsKeyDown(KEY_DOWN))
+	{
+		UpdateScore(0, 1);
+		MoveBlockDown();
+	}
+}
+
 void Game::HandleInput()
 {
 	int keyPressed = GetKeyPressed();

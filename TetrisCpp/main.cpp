@@ -5,15 +5,28 @@
 
 #define sidepanel ((Columns+1) * CellSize) - 10
 
-double lastUpdateTime {0};
+double lastGameTickTime {0};
+double lastMovementTickTime {0};
 
-bool EventTriggerd(double interval)
+bool TickGameSpeed(double interval)
 {
 	double currentTime = GetTime();
 
-	if (currentTime - lastUpdateTime >= interval)
+	if (currentTime - lastGameTickTime >= interval)
 	{
-		lastUpdateTime = currentTime;
+		lastGameTickTime = currentTime;
+		return true;
+	}
+	return false;
+}
+
+bool TickMovementSpeed(double interval)
+{
+	double currentTime = GetTime();
+
+	if (currentTime - lastMovementTickTime >= interval)
+	{
+		lastMovementTickTime = currentTime;
 		return true;
 	}
 	return false;
@@ -37,9 +50,14 @@ int main()
 		// updating
 		game.HandleInput();
 
-		if (EventTriggerd(0.2))
+		if (TickGameSpeed(0.2))
 		{
 			game.MoveBlockDown();
+		}
+
+		if (TickMovementSpeed(0.05))
+		{
+			game.HandleMovement();
 		}
 
 

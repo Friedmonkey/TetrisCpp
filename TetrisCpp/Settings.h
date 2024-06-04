@@ -3,7 +3,7 @@
 #include <Vector>
 #include <Raylib.h>
 
-#define BufferRows 2
+#define BufferRows 3
 #define Rows (20 + BufferRows)
 #define Columns 10
 

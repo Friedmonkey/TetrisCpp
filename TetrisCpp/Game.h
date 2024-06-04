@@ -9,6 +9,7 @@ public:
 	~Game();
 	void Draw();
 	void HandleInput();
+	void HandleMovement();
 	void MoveBlockDown();
 	void RotateLeft();
 	void RotateRight();
