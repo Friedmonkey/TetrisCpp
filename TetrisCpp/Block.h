@@ -16,7 +16,7 @@ public:
 	void RotateLeft();
 	int id;
 	std::map<int, std::vector<Position>> cells;
-	std::map<Position, std::vector<Position>> wallkick;
+	std::map<int, std::vector<Position>> wallkick;
 	int rotationState;
 
 	int rowOffset;

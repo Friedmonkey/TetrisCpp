@@ -1,5 +1,6 @@
 #include "Game.h"
 #include <random>
+#include <iostream>
 
 Game::Game()
 {
@@ -243,7 +244,7 @@ void Game::RotateLeft()
 	{
 		return;
 	}
-	bool success = SRSRotateLeft();
+	bool success = SRSRotateLeft(&currentBlock);
 	if (success)
 	{
 		PlaySound(rotateSound);
@@ -262,7 +263,7 @@ void Game::RotateRight()
 	{
 		return;
 	}
-	bool success = SRSRotateRight();
+	bool success = SRSRotateRight(&currentBlock);
 	if (success)
 	{
 		PlaySound(rotateSound);
@@ -284,7 +285,7 @@ bool Game::SRSRotateRight(Block* pBlock)
 		end = 0;
 	}
 
-	Position kick = pos(start, end);
+	auto kick = rot(start, end);
 	auto kickdata = pBlock->wallkick[kick];
 
 	int orgRow = pBlock->rowOffset;
@@ -292,8 +293,10 @@ bool Game::SRSRotateRight(Block* pBlock)
 
 	pBlock->RotateRight();
 	bool success = false;
+	//int tries = 0;
 	for (Position offset: kickdata)
 	{
+		//tries++;
 		pBlock->Move(offset.row, offset.column);
 		if (IsBlockOutside(pBlock) || !BlockFits(pBlock))
 		{
@@ -304,8 +307,10 @@ bool Game::SRSRotateRight(Block* pBlock)
 		else
 		{
 			success = true;
+			break;
 		}
 	}
+	//std::cout << "it took " << tries << " tries" << std::endl;
 
 	if (!success)
 	{
@@ -326,16 +331,18 @@ bool Game::SRSRotateLeft(Block* pBlock)
 		end = (int)pBlock->cells.size() - 1;
 	}
 
-	Position kick = pos(start, end);
+	auto kick = rot(start, end);
 	auto kickdata = pBlock->wallkick[kick];
 
 	int orgRow = pBlock->rowOffset;
 	int orgColumn = pBlock->colummnOffset;
 
-	pBlock->RotateRight();
+	pBlock->RotateLeft();
 	bool success = false;
+	//int tries = 0;
 	for (Position offset : kickdata)
 	{
+		//tries++;
 		pBlock->Move(offset.row, offset.column);
 		if (IsBlockOutside(pBlock) || !BlockFits(pBlock))
 		{
@@ -346,8 +353,10 @@ bool Game::SRSRotateLeft(Block* pBlock)
 		else
 		{
 			success = true;
+			break;
 		}
 	}
+	//std::cout << "it took " << tries << " tries" << std::endl;
 
 	if (!success)
 	{
