@@ -39,22 +39,24 @@ Game::~Game()
 
 void Game::ApplyShadow()
 {
+	//set the shadow to be the same type of block as currentBlock
 	currentBlockShadow = Block(currentBlock);
-	currentBlockShadow.id += 8;
+	currentBlockShadow.id += 8; //add 8 to the id to give it a darker color
 	DropShadow();
 }
 
 void Game::DropShadow()
 {
+	//set the shadow to the exact position as the block
 	currentBlockShadow.rowOffset = currentBlock.rowOffset;
 	currentBlockShadow.colummnOffset = currentBlock.colummnOffset;
 
-
+	//keep moving the shadow down until it hit something
 	while (!IsBlockOutside(&currentBlockShadow) && BlockFits(&currentBlockShadow))
 	{
 		currentBlockShadow.Move(1, 0);
 	}
-
+	//move it back up one to unclip it
 	currentBlockShadow.Move(-1, 0);
 }
 
@@ -208,13 +210,16 @@ void Game::DropBlockDown()
 	{
 		return;
 	}
-	DropShadow();
+	DropShadow(); //drop the shadow again to make sure it is up to date
 
+	//calculate the distance it will drop
 	int dropDistance = currentBlockShadow.rowOffset - currentBlock.rowOffset;
 
 	PlaySound(dropSound);
+	//drop the block by overwriting its y value
 	currentBlock.rowOffset = currentBlockShadow.rowOffset;
 	
+	//update the socre by twice the dropdistance because you did it instantly
 	UpdateScore(0, dropDistance * 2);
 }
 
@@ -339,6 +344,7 @@ void Game::Reset()
 	blocks = GetAllBlocks();
 	currentBlock = GetRandomBlock();
 	nextBlock = GetRandomBlock();
+	ApplyShadow();
 	score = 0;
 	PlayMusicStream(music);
 }
