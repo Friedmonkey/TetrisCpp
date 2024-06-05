@@ -16,6 +16,15 @@ public:
 		cells[2] = {pos(1,0), pos(1,1), pos(1,2), pos(2,0)};
 		cells[3] = {pos(0,0), pos(0,1), pos(1,1), pos(2,1)};
 		Move(0, center);
+
+		wallkick[pos(0, 1)] = { pos(0, 0), pos(-1, 0), pos(-1, -1), pos(0, +2), pos(-1, +2) };
+		wallkick[pos(1, 0)] = { pos(0, 0), pos(+1, 0), pos(+1, +1), pos(0, -2), pos(+1, -2) };
+		wallkick[pos(1, 2)] = { pos(0, 0), pos(+1, 0), pos(+1, +1), pos(0, -2), pos(+1, -2) };
+		wallkick[pos(2, 1)] = { pos(0, 0), pos(-1, 0), pos(-1, -1), pos(0, +2), pos(-1, +2) };
+		wallkick[pos(2, 3)] = { pos(0, 0), pos(+1, 0), pos(+1, -1), pos(0, +2), pos(+1, +2) };
+		wallkick[pos(3, 2)] = { pos(0, 0), pos(-1, 0), pos(-1, +1), pos(0, -2), pos(-1, -2) };
+		wallkick[pos(3, 0)] = { pos(0, 0), pos(-1, 0), pos(-1, +1), pos(0, -2), pos(-1, -2) };
+		wallkick[pos(0, 3)] = { pos(0, 0), pos(+1, 0), pos(+1, -1), pos(0, +2), pos(+1, +2) };
 	}
 };
 
@@ -30,6 +39,15 @@ public:
 		cells[2] = { pos(1,0), pos(1,1), pos(1,2), pos(2,2) };
 		cells[3] = { pos(0,1), pos(1,1), pos(2,0), pos(2,1) };
 		Move(0, center);
+
+		wallkick[pos(0, 1)] = { pos(0, 0), pos(-1, 0), pos(-1, -1), pos(0, +2), pos(-1, +2) };
+		wallkick[pos(1, 0)] = { pos(0, 0), pos(+1, 0), pos(+1, +1), pos(0, -2), pos(+1, -2) };
+		wallkick[pos(1, 2)] = { pos(0, 0), pos(+1, 0), pos(+1, +1), pos(0, -2), pos(+1, -2) };
+		wallkick[pos(2, 1)] = { pos(0, 0), pos(-1, 0), pos(-1, -1), pos(0, +2), pos(-1, +2) };
+		wallkick[pos(2, 3)] = { pos(0, 0), pos(+1, 0), pos(+1, -1), pos(0, +2), pos(+1, +2) };
+		wallkick[pos(3, 2)] = { pos(0, 0), pos(-1, 0), pos(-1, +1), pos(0, -2), pos(-1, -2) };
+		wallkick[pos(3, 0)] = { pos(0, 0), pos(-1, 0), pos(-1, +1), pos(0, -2), pos(-1, -2) };
+		wallkick[pos(0, 3)] = { pos(0, 0), pos(+1, 0), pos(+1, -1), pos(0, +2), pos(+1, +2) };
 	}
 };
 
@@ -44,6 +62,16 @@ public:
 		cells[2] = { pos(2,0), pos(2,1), pos(2,2), pos(2,3) };
 		cells[3] = { pos(0,1), pos(1,1), pos(2,1), pos(3,1) };
 		Move(-1, center);
+
+		wallkick[pos(0, 1)] = { pos(0, 0), pos(-2, 0), pos(+1, 0), pos(-2, +1), pos(+1, -2) };
+		wallkick[pos(1, 0)] = { pos(0, 0), pos(+2, 0), pos(-1, 0), pos(+2, -1), pos(-1, +2) };
+		wallkick[pos(1, 2)] = { pos(0, 0), pos(-1, 0), pos(+2, 0), pos(-1, -2), pos(+2, +1) };
+		wallkick[pos(2, 1)] = { pos(0, 0), pos(+1, 0), pos(-2, 0), pos(+1, +2), pos(-2, -1) };
+		wallkick[pos(2, 3)] = { pos(0, 0), pos(+2, 0), pos(-1, 0), pos(+2, -1), pos(-1, +2) };
+		wallkick[pos(3, 2)] = { pos(0, 0), pos(-2, 0), pos(+1, 0), pos(-2, +1), pos(+1, -2) };
+		wallkick[pos(3, 0)] = { pos(0, 0), pos(+1, 0), pos(-2, 0), pos(+1, +2), pos(-2, -1) };
+		wallkick[pos(0, 3)] = { pos(0, 0), pos(-1, 0), pos(+2, 0), pos(-1, -2), pos(+2, +1) };
+
 	}
 };
 
@@ -58,6 +86,15 @@ public:
 		//cells[2] = { pos(0,0), pos(0,1), pos(1,0), pos(1,1) };
 		//cells[3] = { pos(0,0), pos(0,1), pos(1,0), pos(1,1) };
 		Move(0, center+1);
+
+		wallkick[pos(0, 1)] = { pos(0, 0) };
+		wallkick[pos(1, 0)] = { pos(0, 0) };
+		wallkick[pos(1, 2)] = { pos(0, 0) };
+		wallkick[pos(2, 1)] = { pos(0, 0) };
+		wallkick[pos(2, 3)] = { pos(0, 0) };
+		wallkick[pos(3, 2)] = { pos(0, 0) };
+		wallkick[pos(3, 0)] = { pos(0, 0) };
+		wallkick[pos(0, 3)] = { pos(0, 0) };
 	}
 };
 
@@ -72,6 +109,15 @@ public:
 		cells[2] = { pos(1,1), pos(1,2), pos(2,0), pos(2,1) };
 		cells[3] = { pos(0,0), pos(1,0), pos(1,1), pos(2,1) };
 		Move(0, center);
+
+		wallkick[pos(0, 1)] = { pos(0, 0), pos(-1, 0), pos(-1, -1), pos(0, +2), pos(-1, +2) };
+		wallkick[pos(1, 0)] = { pos(0, 0), pos(+1, 0), pos(+1, +1), pos(0, -2), pos(+1, -2) };
+		wallkick[pos(1, 2)] = { pos(0, 0), pos(+1, 0), pos(+1, +1), pos(0, -2), pos(+1, -2) };
+		wallkick[pos(2, 1)] = { pos(0, 0), pos(-1, 0), pos(-1, -1), pos(0, +2), pos(-1, +2) };
+		wallkick[pos(2, 3)] = { pos(0, 0), pos(+1, 0), pos(+1, -1), pos(0, +2), pos(+1, +2) };
+		wallkick[pos(3, 2)] = { pos(0, 0), pos(-1, 0), pos(-1, +1), pos(0, -2), pos(-1, -2) };
+		wallkick[pos(3, 0)] = { pos(0, 0), pos(-1, 0), pos(-1, +1), pos(0, -2), pos(-1, -2) };
+		wallkick[pos(0, 3)] = { pos(0, 0), pos(+1, 0), pos(+1, -1), pos(0, +2), pos(+1, +2) };
 	}
 };
 
@@ -86,6 +132,15 @@ public:
 		cells[2] = { pos(1,0), pos(1,1), pos(1,2), pos(2,1) };
 		cells[3] = { pos(0,1), pos(1,0), pos(1,1), pos(2,1) };
 		Move(0, center);
+
+		wallkick[pos(0, 1)] = { pos(0, 0), pos(-1, 0), pos(-1, -1), pos(0, +2), pos(-1, +2) };
+		wallkick[pos(1, 0)] = { pos(0, 0), pos(+1, 0), pos(+1, +1), pos(0, -2), pos(+1, -2) };
+		wallkick[pos(1, 2)] = { pos(0, 0), pos(+1, 0), pos(+1, +1), pos(0, -2), pos(+1, -2) };
+		wallkick[pos(2, 1)] = { pos(0, 0), pos(-1, 0), pos(-1, -1), pos(0, +2), pos(-1, +2) };
+		wallkick[pos(2, 3)] = { pos(0, 0), pos(+1, 0), pos(+1, -1), pos(0, +2), pos(+1, +2) };
+		wallkick[pos(3, 2)] = { pos(0, 0), pos(-1, 0), pos(-1, +1), pos(0, -2), pos(-1, -2) };
+		wallkick[pos(3, 0)] = { pos(0, 0), pos(-1, 0), pos(-1, +1), pos(0, -2), pos(-1, -2) };
+		wallkick[pos(0, 3)] = { pos(0, 0), pos(+1, 0), pos(+1, -1), pos(0, +2), pos(+1, +2) };
 	}
 };
 
@@ -100,5 +155,14 @@ public:
 		cells[2] = { pos(1,0), pos(1,1), pos(2,1), pos(2,2) };
 		cells[3] = { pos(0,1), pos(1,0), pos(1,1), pos(2,0) };
 		Move(0, center);
+
+		wallkick[pos(0, 1)] = { pos(0, 0), pos(-1, 0), pos(-1, -1), pos(0, +2), pos(-1, +2) };
+		wallkick[pos(1, 0)] = { pos(0, 0), pos(+1, 0), pos(+1, +1), pos(0, -2), pos(+1, -2) };
+		wallkick[pos(1, 2)] = { pos(0, 0), pos(+1, 0), pos(+1, +1), pos(0, -2), pos(+1, -2) };
+		wallkick[pos(2, 1)] = { pos(0, 0), pos(-1, 0), pos(-1, -1), pos(0, +2), pos(-1, +2) };
+		wallkick[pos(2, 3)] = { pos(0, 0), pos(+1, 0), pos(+1, -1), pos(0, +2), pos(+1, +2) };
+		wallkick[pos(3, 2)] = { pos(0, 0), pos(-1, 0), pos(-1, +1), pos(0, -2), pos(-1, -2) };
+		wallkick[pos(3, 0)] = { pos(0, 0), pos(-1, 0), pos(-1, +1), pos(0, -2), pos(-1, -2) };
+		wallkick[pos(0, 3)] = { pos(0, 0), pos(+1, 0), pos(+1, -1), pos(0, +2), pos(+1, +2) };
 	}
 };

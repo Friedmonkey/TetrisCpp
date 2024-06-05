@@ -243,17 +243,16 @@ void Game::RotateLeft()
 	{
 		return;
 	}
-	currentBlock.RotateLeft();
-	if (IsBlockOutside(&currentBlock) || !BlockFits(&currentBlock))
-	{
-		currentBlock.RotateRight();
-		PlaySound(cantSound);
-	}
-	else
+	bool success = SRSRotateLeft();
+	if (success)
 	{
 		PlaySound(rotateSound);
 		currentBlockShadow.RotateLeft();
 		DropShadow();
+	}
+	else
+	{
+		PlaySound(cantSound);
 	}
 }
 
@@ -263,20 +262,100 @@ void Game::RotateRight()
 	{
 		return;
 	}
-	currentBlock.RotateRight();
-	if (IsBlockOutside(&currentBlock) || !BlockFits(&currentBlock))
-	{
-		currentBlock.RotateLeft();
-		PlaySound(cantSound);
-	}
-	else
+	bool success = SRSRotateRight();
+	if (success)
 	{
 		PlaySound(rotateSound);
 		currentBlockShadow.RotateRight();
 		DropShadow();
 	}
+	else
+	{
+		PlaySound(cantSound);
+	}
+}
+bool Game::SRSRotateRight(Block* pBlock)
+{
+	int start = pBlock->rotationState;
+	int end = start;
+	end++;
+	if (end == (int)pBlock->cells.size())
+	{
+		end = 0;
+	}
+
+	Position kick = pos(start, end);
+	auto kickdata = pBlock->wallkick[kick];
+
+	int orgRow = pBlock->rowOffset;
+	int orgColumn = pBlock->colummnOffset;
+
+	pBlock->RotateRight();
+	bool success = false;
+	for (Position offset: kickdata)
+	{
+		pBlock->Move(offset.row, offset.column);
+		if (IsBlockOutside(pBlock) || !BlockFits(pBlock))
+		{
+			pBlock->rowOffset = orgRow;
+			pBlock->colummnOffset = orgColumn;
+			continue;
+		}
+		else
+		{
+			success = true;
+		}
+	}
+
+	if (!success)
+	{
+		pBlock->RotateLeft();
+	}
+
+
+	return success;
 }
 
+bool Game::SRSRotateLeft(Block* pBlock)
+{
+	int start = pBlock->rotationState;
+	int end = start;
+	end--;
+	if (end == -1)
+	{
+		end = (int)pBlock->cells.size() - 1;
+	}
+
+	Position kick = pos(start, end);
+	auto kickdata = pBlock->wallkick[kick];
+
+	int orgRow = pBlock->rowOffset;
+	int orgColumn = pBlock->colummnOffset;
+
+	pBlock->RotateRight();
+	bool success = false;
+	for (Position offset : kickdata)
+	{
+		pBlock->Move(offset.row, offset.column);
+		if (IsBlockOutside(pBlock) || !BlockFits(pBlock))
+		{
+			pBlock->rowOffset = orgRow;
+			pBlock->colummnOffset = orgColumn;
+			continue;
+		}
+		else
+		{
+			success = true;
+		}
+	}
+
+	if (!success)
+	{
+		pBlock->RotateRight();
+	}
+
+	return success;
+}
 
 void Game::LockBlock()
 {

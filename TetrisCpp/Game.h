@@ -12,8 +12,6 @@ public:
 	void HandleMovement();
 	void MoveBlockDown();
 	void DropBlockDown();
-	void RotateLeft();
-	void RotateRight();
 	bool gameOver;
 	bool paused;
 	int score;
@@ -24,6 +22,11 @@ private:
 	std::vector<Block> GetAllBlocks();
 	void MoveBlockLeft();
 	void MoveBlockRight();
+	void RotateLeft();
+	void RotateRight();
+
+	bool SRSRotateLeft(Block* pBlock);
+	bool SRSRotateRight(Block *pBlock);
 
 	void Move(int rows, int columns);
 
@@ -35,6 +38,7 @@ private:
 	void ApplyShadow();
 
 	void DropShadow();
+
 
 	Grid grid;
 	std::vector<Block> blocks;
