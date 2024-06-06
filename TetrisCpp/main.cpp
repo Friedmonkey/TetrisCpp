@@ -1,4 +1,3 @@
-#include <iostream>
 #include "settings.h"
 
 #include "Game.h"
@@ -32,11 +31,14 @@ bool TickMovementSpeed(double interval)
 	return false;
 }
 
-int main()
+//int main()
+int WinMain()
 {
-	std::cout << "Hello world!" << std::endl;
+	//std::cout << "Hello world!" << std::endl;
 
 	InitWindow(SW+200, SH+20, "Tetris game lol");
+	Image icon = LoadImage("Assets/Images/Tetris.png");
+	SetWindowIcon(icon);
 	SetTargetFPS(60);
 
 	Font font = LoadFontEx("Assets/Fonts/block.ttf", 64, 0, 0);

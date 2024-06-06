@@ -1,5 +1,4 @@
 #include "Grid.h"
-#include <iostream>
 
 Grid::Grid()
 {
@@ -84,18 +83,6 @@ void Grid::MoveRowDown(int row, int amount)
 	}
 }
 
-
-void Grid::Print()
-{
-	for (size_t r = 0; r < Rows; r++)
-	{
-		for (size_t c = 0; c < Columns; c++)
-		{
-			std::cout << grid[r][c] << " ";
-		}
-		std::cout << std::endl;
-	}
-}
 
 void Grid::Initialize()
 {
