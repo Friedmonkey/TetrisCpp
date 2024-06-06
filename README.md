@@ -1,3 +1,3 @@
 # TetrisCpp
 
-![Screen Shot](/tetris.png)
+![Screen Shot](/Tetris.png)
