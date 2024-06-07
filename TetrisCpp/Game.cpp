@@ -292,7 +292,6 @@ bool Game::SRSRotateRight(Block* pBlock)
 
 	pBlock->RotateRight();
 	bool success = false;
-	//int tries = 0;
 	for (Position offset: kickdata)
 	{
 		//tries++;
@@ -319,6 +318,7 @@ bool Game::SRSRotateRight(Block* pBlock)
 
 	return success;
 }
+
 
 bool Game::SRSRotateLeft(Block* pBlock)
 {
