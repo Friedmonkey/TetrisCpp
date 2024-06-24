@@ -3,12 +3,13 @@
 
 #include <Map>
 #include "Position.h"
+#include "PowerupType.h"
 
 class Block
 {
 public:
 	Block();
-	void Draw(int offsetX, int offsetY);
+	void Draw();
 	void DrawUI(int offsetX, int offsetY);
 	void Move(int rows, int columns);
 	std::vector<Position> GetCellPositions();
@@ -21,6 +22,7 @@ public:
 
 	int rowOffset;
 	int colummnOffset;
+	PowerupType powerup;
 private:
 	std::vector<Color> colors;
 };

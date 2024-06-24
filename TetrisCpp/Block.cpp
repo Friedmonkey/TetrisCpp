@@ -8,9 +8,10 @@ Block::Block()
 	id = 0;
 	colummnOffset = 0;
 	rowOffset = 0;
+	powerup = BlockNormal;
 }
 
-void Block::Draw(int offsetX, int offsetY)
+void Block::Draw()
 {
 	std::vector<Position> tiles = GetCellPositions();
 	for (Position item: tiles)
@@ -19,13 +20,11 @@ void Block::Draw(int offsetX, int offsetY)
 		{
 			continue;
 		}
-		DrawRectangle(
-			item.column*CellSize+GapSize+OffSet, 
-			(item.row-BufferRows)*CellSize+GapSize+OffSet,
-			CellSize-GapSize, 
-			CellSize-GapSize, 
-			colors[id]
-		);
+		int x = item.column * CellSize + GapSize + OffSet;
+		int y = (item.row-BufferRows)*CellSize+GapSize+OffSet;
+		int w = CellSize - GapSize;
+		int h = CellSize - GapSize;
+		DrawRectangle(x, y, w, h, colors[id]);
 	}
 }
 
@@ -34,13 +33,12 @@ void Block::DrawUI(int offsetX, int offsetY)
 	std::vector<Position> tiles = GetCellPositions();
 	for (Position item : tiles)
 	{
-		DrawRectangle(
-			item.column * CellSize + GapSize + OffSet + offsetX,
-			item.row * CellSize + GapSize + OffSet + offsetY,
-			CellSize - GapSize,
-			CellSize - GapSize,
-			colors[id]
-		);
+		int x = item.column * CellSize + GapSize + OffSet + offsetX;
+		int y = item.row * CellSize + GapSize + OffSet + offsetY;
+		int w = CellSize - GapSize;
+		int h = CellSize - GapSize;
+
+		DrawRectangle(x, y, w, h, colors[id]);
 	}
 }
 

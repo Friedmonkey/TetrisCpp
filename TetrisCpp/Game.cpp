@@ -1,6 +1,12 @@
 #include "Game.h"
 #include <random>
 
+#define LoadPowerup(name) \
+Image image##name = LoadImage("Assets/Images/" #name ".png"); \
+ImageResize(&image##name, CellSize, CellSize); \
+name = LoadTextureFromImage(image##name); \
+UnloadImage(image##name)
+
 Game::Game()
 {
 	grid = Grid();
@@ -21,10 +27,24 @@ Game::Game()
 	lockSound = LoadSound("Assets/Audio/lock.wav");
 	cantSound = LoadSound("Assets/Audio/cant.wav");
 	clickSound = LoadSound("Assets/Audio/click.wav");
+
+
+	LoadPowerup(NormalPowerup);
+	LoadPowerup(FreezePowerup);
+	LoadPowerup(BombPowerup);
+	LoadPowerup(LineBombPowerup);
+	LoadPowerup(ColorBombPowerup);
+
 }
 
 Game::~Game()
 {
+	UnloadTexture(NormalPowerup);
+	UnloadTexture(FreezePowerup);
+	UnloadTexture(BombPowerup);
+	UnloadTexture(LineBombPowerup);
+	UnloadTexture(ColorBombPowerup);
+
 	UnloadSound(rotateSound);
 	UnloadSound(clearSound);
 	UnloadSound(loseSound);
@@ -41,7 +61,7 @@ void Game::ApplyShadow()
 {
 	//set the shadow to be the same type of block as currentBlock
 	currentBlockShadow = Block(currentBlock);
-	currentBlockShadow.id += 8; //add 8 to the id to give it a darker color
+	currentBlockShadow.id += 9; //add 9 to the id to give it a darker color
 	DropShadow();
 }
 
@@ -69,29 +89,100 @@ Block Game::GetRandomBlock()
 	int randomIndex = GetRandomValue(0, blocks.size()-1);
 	Block block = blocks[randomIndex];
 	blocks.erase(blocks.begin() + randomIndex);
+
+	PowerupType powerup {BlockNormal};
+	int randomPowerup = GetRandomValue(0,10);
+	if (randomPowerup <= 4)
+	{
+		powerup = static_cast<PowerupType>(randomPowerup);
+	}
+
+	block.powerup = powerup;
+
 	return block;
 }
 
 std::vector<Block> Game::GetAllBlocks()
 {
-	return {IBlock(), JBlock(), LBlock(), OBlock(), SBlock(), TBlock(), ZBlock()};
+	return {IBlock(), JBlock(), LBlock(), OBlock(), SBlock(), TBlock(), ZBlock(), DBlock()};
+}
+void Game::DrawBlock(Block *pBlock)
+{
+	pBlock->Draw();
+	if (pBlock->powerup != BlockNormal)
+	{
+		std::vector<Position> tiles = pBlock->GetCellPositions();
+		for (Position item : tiles)
+		{
+			if (item.row < BufferRows) continue;
+			int x = item.column * CellSize + GapSize + OffSet;
+			int y = (item.row - BufferRows) * CellSize + GapSize + OffSet;
+			int w = CellSize - GapSize;
+			int h = CellSize - GapSize;
+			DrawPowerUp(pBlock->powerup, x, y, w, h);
+		}
+	}
+}
+void Game::DrawBlockUI(Block* pBlock, int offX, int offY)
+{
+	pBlock->DrawUI(offX, offY);
+	if (pBlock->powerup != BlockNormal)
+	{
+		std::vector<Position> tiles = pBlock->GetCellPositions();
+		for (Position item : tiles)
+		{
+			int x = item.column * CellSize + GapSize + OffSet + offX;
+			int y = item.row * CellSize + GapSize + OffSet + offY;
+			int w = CellSize - GapSize;
+			int h = CellSize - GapSize;
+			DrawPowerUp(pBlock->powerup, x,y,w,h);
+		}
+	}
+}
+
+void Game::DrawPowerUp(PowerupType powerup, int x, int y, int w, int h)
+{
+	switch (powerup)
+	{
+	case BlockNormal:
+		DrawTexture(NormalPowerup, x, y, WHITE);
+		break;
+	case BlockFreeze:
+		DrawTexture(FreezePowerup, x, y, WHITE);
+		break;
+	case BlockBomb:
+		DrawTexture(BombPowerup, x, y, WHITE);
+		break;
+	case BlockLineBomb:
+		DrawTexture(LineBombPowerup, x, y, WHITE);
+		break;
+	case BlockColorBomb:
+		DrawTexture(ColorBombPowerup, x, y, WHITE);
+		break;
+	default:
+		break;
+	}
 }
 
 void Game::Draw()
 {
 	grid.Draw();
-	currentBlock.Draw(0,0);
-	currentBlockShadow.Draw(0,0);
+
+	DrawBlock(&currentBlock);
+	DrawBlock(&currentBlockShadow);
 	switch (nextBlock.id)
 	{
 	case 3: //i block
-		nextBlock.DrawUI( ((Columns-2)*CellSize)-5, (6*CellSize)-5);
+		DrawBlockUI(&nextBlock, ((Columns - 2) * CellSize) - 5, (6 * CellSize) - 5);
 		break;
 	case 4: //o block
-		nextBlock.DrawUI( ((Columns-2)*CellSize)-5, (5*CellSize)+10);
+		DrawBlockUI(&nextBlock, ((Columns - 2) * CellSize) - 5, (5 * CellSize) + 10);
+		break;
+	case 8: //d block
+		DrawBlockUI(&nextBlock, ((Columns - 3) * CellSize) + 5, (6 * CellSize) - 5);
 		break;
 	default:
-		nextBlock.DrawUI( ((Columns-2)*CellSize)+10, (5*CellSize)+10);
+		DrawBlockUI(&nextBlock, ((Columns-2)*CellSize)+10, (5*CellSize)+10);
 		break;
 	}
 }

@@ -30,6 +30,10 @@ private:
 
 	void Move(int rows, int columns);
 
+	void DrawBlock(Block* pBlock);
+	void DrawBlockUI(Block* pBlock, int offX, int offY);
+	void DrawPowerUp(PowerupType powerup, int x, int y, int w, int h);
+
 	bool IsBlockOutside(Block* pBlock);
 	bool BlockFits(Block* pBlock);
 	void LockBlock();
@@ -39,6 +43,12 @@ private:
 
 	void DropShadow();
 
+
+	Texture2D NormalPowerup;
+	Texture2D FreezePowerup;
+	Texture2D BombPowerup;
+	Texture2D LineBombPowerup;
+	Texture2D ColorBombPowerup;
 
 	Grid grid;
 	std::vector<Block> blocks;

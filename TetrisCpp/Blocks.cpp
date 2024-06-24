@@ -169,3 +169,26 @@ public:
 		wallkick[rot(0, 3)] = { kick(0, 0), kick(+1, 0), kick(+1, -1), kick(0, +2), kick(+1, +2) };
 	}
 };
+
+class DBlock : public Block
+{
+public:
+	DBlock()
+	{
+		id = 8; //white
+		cells[0] = { pos(0,1) };
+		//cells[1] = { pos(0,0), pos(0,1), pos(1,0), pos(1,1) };
+		//cells[2] = { pos(0,0), pos(0,1), pos(1,0), pos(1,1) };
+		//cells[3] = { pos(0,0), pos(0,1), pos(1,0), pos(1,1) };
+		Move(0, center + 1);
+
+		wallkick[rot(0, 1)] = { kick(0, 0) };
+		wallkick[rot(1, 0)] = { kick(0, 0) };
+		wallkick[rot(1, 2)] = { kick(0, 0) };
+		wallkick[rot(2, 1)] = { kick(0, 0) };
+		wallkick[rot(2, 3)] = { kick(0, 0) };
+		wallkick[rot(3, 2)] = { kick(0, 0) };
+		wallkick[rot(3, 0)] = { kick(0, 0) };
+		wallkick[rot(0, 3)] = { kick(0, 0) };
+	}
+};

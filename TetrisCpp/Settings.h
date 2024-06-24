@@ -28,6 +28,7 @@
 #define purple Color { 166, 0, 247,
 #define cyan Color { 21, 204, 209,
 #define blue Color { 13, 64, 216,
+#define white Color { 255, 255, 255,
 
 #define normal 255 }
 #define shadow 100 }
@@ -38,8 +39,8 @@ static std::vector<Color> GetCellColors()
 {
 	return 
 	{
-		darkGrey normal, green normal, red normal, orange normal, yellow normal, purple normal, cyan normal, blue normal,
-		darkGrey shadow, green shadow, red shadow, orange shadow, yellow shadow, purple shadow, cyan shadow, blue shadow
+		darkGrey normal, green normal, red normal, orange normal, yellow normal, purple normal, cyan normal, blue normal, white normal,
+		darkGrey shadow, green shadow, red shadow, orange shadow, yellow shadow, purple shadow, cyan shadow, blue shadow, white shadow
 	};
 }
 
