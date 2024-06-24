@@ -31,8 +31,8 @@ bool TickMovementSpeed(double interval)
 	return false;
 }
 
-//int main()
-int WinMain()
+int main()
+//int WinMain()
 {
 	//std::cout << "Hello world!" << std::endl;
 

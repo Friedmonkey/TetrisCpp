@@ -7,20 +7,35 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TetrisCpp", "TetrisCpp\Tetr
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|ARM = Debug|ARM
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
+		Release|ARM = Release|ARM
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
+		ReleaseArm|ARM = ReleaseArm|ARM
+		ReleaseArm|x64 = ReleaseArm|x64
+		ReleaseArm|x86 = ReleaseArm|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D0C997D3-B99D-47F3-A0D1-3EF44DD58B50}.Debug|ARM.ActiveCfg = Debug|ARM
+		{D0C997D3-B99D-47F3-A0D1-3EF44DD58B50}.Debug|ARM.Build.0 = Debug|ARM
 		{D0C997D3-B99D-47F3-A0D1-3EF44DD58B50}.Debug|x64.ActiveCfg = Debug|x64
 		{D0C997D3-B99D-47F3-A0D1-3EF44DD58B50}.Debug|x64.Build.0 = Debug|x64
 		{D0C997D3-B99D-47F3-A0D1-3EF44DD58B50}.Debug|x86.ActiveCfg = Debug|Win32
 		{D0C997D3-B99D-47F3-A0D1-3EF44DD58B50}.Debug|x86.Build.0 = Debug|Win32
+		{D0C997D3-B99D-47F3-A0D1-3EF44DD58B50}.Release|ARM.ActiveCfg = Release|ARM
+		{D0C997D3-B99D-47F3-A0D1-3EF44DD58B50}.Release|ARM.Build.0 = Release|ARM
 		{D0C997D3-B99D-47F3-A0D1-3EF44DD58B50}.Release|x64.ActiveCfg = Release|x64
 		{D0C997D3-B99D-47F3-A0D1-3EF44DD58B50}.Release|x64.Build.0 = Release|x64
 		{D0C997D3-B99D-47F3-A0D1-3EF44DD58B50}.Release|x86.ActiveCfg = Release|Win32
 		{D0C997D3-B99D-47F3-A0D1-3EF44DD58B50}.Release|x86.Build.0 = Release|Win32
+		{D0C997D3-B99D-47F3-A0D1-3EF44DD58B50}.ReleaseArm|ARM.ActiveCfg = ReleaseArm|ARM
+		{D0C997D3-B99D-47F3-A0D1-3EF44DD58B50}.ReleaseArm|ARM.Build.0 = ReleaseArm|ARM
+		{D0C997D3-B99D-47F3-A0D1-3EF44DD58B50}.ReleaseArm|x64.ActiveCfg = ReleaseArm|ARM
+		{D0C997D3-B99D-47F3-A0D1-3EF44DD58B50}.ReleaseArm|x64.Build.0 = ReleaseArm|ARM
+		{D0C997D3-B99D-47F3-A0D1-3EF44DD58B50}.ReleaseArm|x86.ActiveCfg = ReleaseArm|Win32
+		{D0C997D3-B99D-47F3-A0D1-3EF44DD58B50}.ReleaseArm|x86.Build.0 = ReleaseArm|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
