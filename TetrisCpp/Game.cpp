@@ -3,7 +3,7 @@
 
 #define LoadPowerup(name) \
 Image image##name = LoadImage("Assets/Images/" #name ".png"); \
-ImageResize(&image##name, CellSize, CellSize); \
+ImageResize(&image##name, CellSize-GapSize, CellSize-GapSize); \
 name = LoadTextureFromImage(image##name); \
 UnloadImage(image##name)
 

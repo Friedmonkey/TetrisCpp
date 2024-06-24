@@ -31,7 +31,7 @@
 #define white Color { 255, 255, 255,
 
 #define normal 255 }
-#define shadow 100 }
+#define shadow 50 }
 
 
 
