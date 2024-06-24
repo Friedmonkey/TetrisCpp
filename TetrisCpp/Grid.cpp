@@ -13,7 +13,11 @@ void Grid::Draw()
 		for (size_t c = 0; c < Columns; c++)
 		{
 			int cellValue = grid[r][c];
-			DrawRectangle(c*CellSize+GapSize+OffSet, (r-BufferRows)*CellSize+GapSize+OffSet, CellSize-GapSize, CellSize-GapSize, colors[cellValue]);
+			int x = c * CellSize + GapSize + OffSet;
+			int y = (r - BufferRows) * CellSize + GapSize + OffSet;
+			int w = CellSize - GapSize;
+			int h = CellSize - GapSize;
+			DrawRectangle(x, y, w, h, colors[cellValue]);
 		}
 	}
 }
@@ -71,6 +75,8 @@ void Grid::ClearRow(int row)
 	for (size_t column = 0; column < Columns; column++)
 	{
 		grid[row][column] = 0;
+
+		powerups[row][column] = BlockNormal;
 	}
 }
 
@@ -80,6 +86,9 @@ void Grid::MoveRowDown(int row, int amount)
 	{
 		grid[row + amount][column] = grid[row][column];
 		grid[row][column] = 0;
+
+		powerups[row + amount][column] = powerups[row][column];
+		powerups[row][column] = BlockNormal;
 	}
 }
 
@@ -92,6 +101,7 @@ void Grid::Initialize()
 		for (size_t c = 0; c < Columns; c++)
 		{
 			grid[r][c] = 0;
+			powerups[r][c] = BlockNormal;
 		}
 	}
 }

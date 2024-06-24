@@ -33,6 +33,8 @@ private:
 	void DrawBlock(Block* pBlock);
 	void DrawBlockUI(Block* pBlock, int offX, int offY);
 	void DrawPowerUp(PowerupType powerup, int x, int y, int w, int h);
+	void DrawGrid();
+
 
 	bool IsBlockOutside(Block* pBlock);
 	bool BlockFits(Block* pBlock);

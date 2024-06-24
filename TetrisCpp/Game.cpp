@@ -164,9 +164,28 @@ void Game::DrawPowerUp(PowerupType powerup, int x, int y, int w, int h)
 	}
 }
 
-void Game::Draw()
+void Game::DrawGrid()
 {
 	grid.Draw();
+
+	for (size_t r = BufferRows; r < Rows; r++)
+	{
+		for (size_t c = 0; c < Columns; c++)
+		{
+			PowerupType cellValue = grid.powerups[r][c];
+			int x = c * CellSize + GapSize + OffSet;
+			int y = (r - BufferRows) * CellSize + GapSize + OffSet;
+			int w = CellSize - GapSize;
+			int h = CellSize - GapSize;
+
+			DrawPowerUp(cellValue, x, y, w, h);
+		}
+	}
+}
+
+void Game::Draw()
+{
+	DrawGrid();
 
 	DrawBlock(&currentBlock);
 	DrawBlock(&currentBlockShadow);
@@ -462,6 +481,7 @@ void Game::LockBlock()
 	for (Position item: tiles)
 	{
 		grid.grid[item.row][item.column] = currentBlock.id;
+		grid.powerups[item.row][item.column] = currentBlock.powerup;
 	}
 
 	currentBlock = nextBlock;
