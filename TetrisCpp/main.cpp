@@ -12,6 +12,8 @@
 double lastGameTickTime {0};
 double lastMovementTickTime {0};
 bool Menu = true;
+bool hover = false;
+Music titleMusic;
 
 bool TickGameSpeed(double interval)
 {
@@ -117,7 +119,7 @@ void WriteCenter(const char *text, float height, const Font* pFont, int fontSize
 }
 
 // Function to draw a centered button with text and return its rectangle
-Rectangle ButtonCenter(const char* text, float height, const Font* pFont, const int fontSize, const int fontSpacing, const Color color, const Color buttonColor)
+Rectangle ButtonCenter(const char* text, float height, const Font* pFont, const int fontSize, const int fontSpacing, const Color color, const Color buttonColor, Game *pGame)
 {
 	const int widthCenter = (SW + 200) / 2;
 	Vector2 textSize = MeasureTextEx(*pFont, text, fontSize, fontSpacing);
@@ -132,10 +134,15 @@ Rectangle ButtonCenter(const char* text, float height, const Font* pFont, const 
 	if (CheckCollisionCircleRec(GetMousePosition(), 2, buttonRect))
 	{
 		newButtonColor.a = buttonColor.a/2;
+		if (!hover)
+		{
+			hover = true;
+			pGame->PlayClick();
+		}
 	}
 
 	// Draw the button rectangle with rounded corners
-	DrawRectangleRounded(buttonRect, 0.5f, 6, newButtonColor);
+	DrawRectangleRounded(buttonRect, 0.25f, 6, newButtonColor);
 
 	// Draw the centered text
 	DrawTextEx(*pFont, text, { widthCenter - (textSize.x / 2), height }, fontSize, fontSpacing, color);
@@ -175,6 +182,7 @@ float splashOscillationTime = 0.0f; // Time variable for oscillation
 
 void HandleMenuLogic(Game* pGame, const Font* pFont)
 {
+	UpdateMusicStream(titleMusic);
 	const int textSize = (SW + 200) / 7;
 
 	BeginDrawing();
@@ -217,9 +225,16 @@ void HandleMenuLogic(Game* pGame, const Font* pFont)
 
 	// Draw a centered button
 	Color buttonColor = { 0, 121, 241, 255 }; // Blue button color
-	Rectangle normalRect = ButtonCenter("Play Normal", 300, pFont, 20, 1, WHITE, buttonColor);
+	Rectangle normalRect = ButtonCenter("Play Normal", 300, pFont, 20, 1, WHITE, buttonColor, pGame);
 
-	Rectangle powerupRect = ButtonCenter("Play Powerups", 350, pFont, 20, 1, WHITE, buttonColor);
+	Rectangle powerupRect = ButtonCenter("Play Powerups", 350, pFont, 20, 1, WHITE, buttonColor, pGame);
+
+
+
+	if (!(CheckCollisionCircleRec(GetMousePosition(), 2, normalRect) || CheckCollisionCircleRec(GetMousePosition(), 2, powerupRect)))
+	{
+		hover = false;
+	}
 
 	if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) //if you clicked
 	{
@@ -227,12 +242,14 @@ void HandleMenuLogic(Game* pGame, const Font* pFont)
 		if (CheckCollisionCircleRec(GetMousePosition(), 2, normalRect))
 		{
 			pGame->powerupsEnabled = false;
+			pGame->PlayLock();
 			Menu = false;
 			return;
 		}
 		else if (CheckCollisionCircleRec(GetMousePosition(), 2, powerupRect))
 		{
 			pGame->powerupsEnabled = true;
+			pGame->PlayLock();
 			Menu = false;
 			return;
 		}
@@ -254,9 +271,11 @@ int main()
 	SetTargetFPS(60);
 
 	Font font = LoadFontEx("Assets/Fonts/block.ttf", 64, 0, 0);
+	Game game = Game(); //init audio device
 
-	Game game = Game();
 
+	titleMusic = LoadMusicStream("Assets/Audio/Title.mp3");
+	PlayMusicStream(titleMusic);
 
 	while (!WindowShouldClose())
 	{

@@ -74,6 +74,15 @@ Game::~Game()
 	CloseAudioDevice();
 }
 
+void Game::PlayClick()
+{
+	PlaySound(clickSound);
+}
+void Game::PlayLock()
+{
+	PlaySound(lockSound);
+}
+
 void Game::ApplyShadow()
 {
 	//set the shadow to be the same type of block as currentBlock

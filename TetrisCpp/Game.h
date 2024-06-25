@@ -11,6 +11,8 @@ public:
 	void Draw();
 	void HandleInput();
 	void UpdateAnimations();
+	void PlayClick();
+	void PlayLock();
 
 	void HandleMovement();
 	void MoveBlockDown();
