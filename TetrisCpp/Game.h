@@ -16,10 +16,12 @@ public:
 	void MoveBlockDown();
 	void DropBlockDown();
 	bool gameOver;
+	bool powerupsEnabled = false;
 	bool paused;
 	int score;
 	float gameSpeed = baseSpeed;
 	Music music;
+
 
 private:
 	Block GetRandomBlock();

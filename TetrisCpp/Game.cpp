@@ -116,6 +116,9 @@ Block Game::GetRandomBlock()
 	Block block = blocks[randomIndex];
 	blocks.erase(blocks.begin() + randomIndex);
 
+	if (!powerupsEnabled) return block;
+
+
 	PowerupType powerup {BlockNormal};
 	int randomPowerup = GetRandomValue(0,10);
 	if (randomPowerup <= 5)
@@ -130,11 +133,19 @@ Block Game::GetRandomBlock()
 
 std::vector<Block> Game::GetAllBlocks()
 {
-	return {IBlock(), JBlock(), LBlock(), OBlock(), SBlock(), TBlock(), ZBlock(), DBlock()};
+	if (powerupsEnabled)
+	{
+		return {IBlock(), JBlock(), LBlock(), OBlock(), SBlock(), TBlock(), ZBlock(), DBlock()};
+	}
+	else
+	{
+		return {IBlock(), JBlock(), LBlock(), OBlock(), SBlock(), TBlock(), ZBlock()};
+	}
 }
 void Game::DrawBlock(Block *pBlock)
 {
 	pBlock->Draw();
+	if (!powerupsEnabled) return;
 	if (pBlock->powerup != BlockNormal)
 	{
 		std::vector<Position> tiles = pBlock->GetCellPositions();
@@ -150,6 +161,7 @@ void Game::DrawBlock(Block *pBlock)
 void Game::DrawBlockUI(Block* pBlock, int offX, int offY)
 {
 	pBlock->DrawUI(offX, offY);
+	if (!powerupsEnabled) return;
 	if (pBlock->powerup != BlockNormal)
 	{
 		std::vector<Position> tiles = pBlock->GetCellPositions();
@@ -212,7 +224,7 @@ void Game::DrawPowerUp(PowerupType powerup, int x, int y, bool isShadow)
 void Game::DrawGrid()
 {
 	grid.Draw();
-
+	if (!powerupsEnabled) return;
 	for (size_t r = BufferRows; r < Rows; r++)
 	{
 		for (size_t c = 0; c < Columns; c++)
