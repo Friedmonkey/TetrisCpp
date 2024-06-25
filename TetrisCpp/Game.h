@@ -18,6 +18,7 @@ public:
 	bool gameOver;
 	bool paused;
 	int score;
+	float gameSpeed = baseSpeed;
 	Music music;
 
 private:
@@ -48,6 +49,9 @@ private:
 
 	void DropShadow();
 
+	void UpdateGameSpeed(int linesCleared);
+	float baseSpeed = 0.3f;
+	float minSpeed = 0.08f;
 
 	Texture2D NormalPowerup;
 	Texture2D FreezePowerup;

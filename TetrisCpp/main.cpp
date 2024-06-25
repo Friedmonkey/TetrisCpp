@@ -1,6 +1,9 @@
 #include "settings.h"
 
 #include "Game.h"
+#include <iomanip>
+#include <sstream>
+#include "StreamBuffer.h"
 
 #define sidepanel ((Columns+1) * CellSize) - 10
 
@@ -54,7 +57,7 @@ int main()
 		game.UpdateAnimations();
 		game.HandleInput();
 
-		if (TickGameSpeed(0.2))
+		if (TickGameSpeed(game.gameSpeed))
 		{
 			game.MoveBlockDown();
 		}
@@ -72,8 +75,8 @@ int main()
 		DrawTextEx(font, "Score", {sidepanel, 15}, 25, 2, WHITE);
 
 		//score field
-		Rectangle rect = Rectangle {sidepanel-GapSize, 55, 170, 60};
-		DrawRectangleRounded(rect, 0.3, 6, LIGHTBLUE);
+		Rectangle scoreRect = Rectangle {sidepanel-GapSize, 55, 170, 60};
+		DrawRectangleRounded(scoreRect, 0.3, 6, LIGHTBLUE);
 
 		//Score value
 		char scoreText[10];
@@ -94,6 +97,21 @@ int main()
 			DrawTextEx(font, "Press \"U\"", { sidepanel, 350 }, 25, 2, WHITE);
 			DrawTextEx(font, "to restart", { sidepanel, 375 }, 25, 2, WHITE);
 		}
+
+
+		//speed text
+		DrawTextEx(font, "Speed", { sidepanel, 415 }, 25, 2, WHITE);
+
+		//speed field
+		Rectangle speedRect = Rectangle{ sidepanel - GapSize, 455, 170, 60 };
+		DrawRectangleRounded(speedRect, 0.3, 6, LIGHTBLUE);
+
+		//speed value
+		char   speedText[20];
+		omemstream out(speedText);
+
+		out << std::fixed << std::setprecision(4) << game.gameSpeed;
+		DrawTextEx(font, speedText, { sidepanel, 480 }, 25, 2, WHITE);
 
 
 		game.Draw();

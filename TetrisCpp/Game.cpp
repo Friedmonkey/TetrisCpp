@@ -1,5 +1,6 @@
 #include "Game.h"
 #include <random>
+#include <cmath>
 
 #define LoadPowerup(name) \
 Image image##name = LoadImage("Assets/Images/" #name ".png"); \
@@ -24,6 +25,7 @@ Game::Game()
 	InitAudioDevice();
 	music = LoadMusicStream("Assets/Audio/Tetris.mp3");
 	PlayMusicStream(music);
+	gameSpeed = baseSpeed;
 
 	rotateSound = LoadSound("Assets/Audio/rotate.wav");
 	clearSound = LoadSound("Assets/Audio/clear.wav");
@@ -93,6 +95,15 @@ void Game::DropShadow()
 	}
 	//move it back up one to unclip it
 	currentBlockShadow.Move(-1, 0);
+}
+
+void Game::UpdateGameSpeed(int linesCleared)
+{
+	gameSpeed -= 0.0012f * (linesCleared*2); // Increase speed every 10 lines
+	if (gameSpeed < minSpeed)
+	{
+		gameSpeed = minSpeed;
+	}
 }
 
 Block Game::GetRandomBlock()
@@ -528,6 +539,7 @@ void Game::LockBlock()
 	nextBlock = GetRandomBlock();
 
 	int rowsCleared = grid.ClearFullRows();
+	UpdateGameSpeed(rowsCleared);
 	UpdateScore(rowsCleared,0);
 	if (rowsCleared > 2)
 	{
@@ -569,6 +581,7 @@ bool Game::BlockFits(Block *pBlock)
 void Game::Reset()
 {
 	grid.Initialize();
+	gameSpeed = baseSpeed;
 	gameOver = false;
 	paused = false;
 	blocks = GetAllBlocks();
