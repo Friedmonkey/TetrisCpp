@@ -188,11 +188,11 @@ void Game::DrawPowerUp(PowerupType powerup, int x, int y, bool isShadow)
 	Color color;
 	if (isShadow)
 	{
-		color = {255, 255, 255, shadow;
+		color = {255, 255, 255, cshadow;
 	}
 	else
 	{
-		color = {255, 255, 255, normal;
+		color = {255, 255, 255, cnormal;
 	}
 	switch (powerup)
 	{
