@@ -41,7 +41,7 @@ Game::Game()
 	LoadPowerup(LineBombPowerup);
 	LoadPowerup(ColorBombPowerup);
 
-	LoadAnimiatedPowerup(FirePowerup, 32, 1);
+	LoadAnimiatedPowerup(FirePowerup, 32, 1); //uses Atlas.png
 
 	FireAnimation = FriedAnimatedTexure(&FirePowerup, 32, 1);
 
@@ -106,14 +106,10 @@ Block Game::GetRandomBlock()
 	blocks.erase(blocks.begin() + randomIndex);
 
 	PowerupType powerup {BlockNormal};
-	int randomPowerup = GetRandomValue(0,20);
+	int randomPowerup = GetRandomValue(0,10);
 	if (randomPowerup <= 5)
 	{
 		powerup = static_cast<PowerupType>(randomPowerup);
-	}
-	else
-	{
-		powerup = BlockFire;
 	}
 
 	block.powerup = powerup;
