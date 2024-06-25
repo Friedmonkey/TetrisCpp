@@ -7,6 +7,12 @@ ImageResize(&image##name, CellSize-GapSize, CellSize-GapSize); \
 name = LoadTextureFromImage(image##name); \
 UnloadImage(image##name)
 
+#define LoadAnimiatedPowerup(name, framesPerLine, lines) \
+Image image##name = LoadImage("Assets/Images/" #name "Atlas.png"); \
+ImageResize(&image##name, (CellSize-GapSize)*framesPerLine, (CellSize-GapSize)*lines); \
+name = LoadTextureFromImage(image##name); \
+UnloadImage(image##name)
+
 Game::Game()
 {
 	grid = Grid();
@@ -35,6 +41,14 @@ Game::Game()
 	LoadPowerup(LineBombPowerup);
 	LoadPowerup(ColorBombPowerup);
 
+	LoadAnimiatedPowerup(FirePowerup, 32, 1);
+
+	FireAnimation = FriedAnimatedTexure(&FirePowerup, 32, 1);
+
+	//imFirePowerup = LoadImageAnim("Assets/Images/FirePowerup.gif", &fireanimFrames);
+	//ImageResize(&imFirePowerup, CellSize - GapSize, CellSize - GapSize);
+	//FirePowerup = LoadTextureFromImage(imFirePowerup);
+
 }
 
 Game::~Game()
@@ -44,6 +58,7 @@ Game::~Game()
 	UnloadTexture(BombPowerup);
 	UnloadTexture(LineBombPowerup);
 	UnloadTexture(ColorBombPowerup);
+	UnloadTexture(FirePowerup);
 
 	UnloadSound(rotateSound);
 	UnloadSound(clearSound);
@@ -91,10 +106,14 @@ Block Game::GetRandomBlock()
 	blocks.erase(blocks.begin() + randomIndex);
 
 	PowerupType powerup {BlockNormal};
-	int randomPowerup = GetRandomValue(0,10);
-	if (randomPowerup <= 4)
+	int randomPowerup = GetRandomValue(0,20);
+	if (randomPowerup <= 5)
 	{
 		powerup = static_cast<PowerupType>(randomPowerup);
+	}
+	else
+	{
+		powerup = BlockFire;
 	}
 
 	block.powerup = powerup;
@@ -117,9 +136,7 @@ void Game::DrawBlock(Block *pBlock)
 			if (item.row < BufferRows) continue;
 			int x = item.column * CellSize + GapSize + OffSet;
 			int y = (item.row - BufferRows) * CellSize + GapSize + OffSet;
-			int w = CellSize - GapSize;
-			int h = CellSize - GapSize;
-			DrawPowerUp(pBlock->powerup, x, y, w, h);
+			DrawPowerUp(pBlock->powerup, x, y, (pBlock->id > 8));
 		}
 	}
 }
@@ -133,31 +150,52 @@ void Game::DrawBlockUI(Block* pBlock, int offX, int offY)
 		{
 			int x = item.column * CellSize + GapSize + OffSet + offX;
 			int y = item.row * CellSize + GapSize + OffSet + offY;
-			int w = CellSize - GapSize;
-			int h = CellSize - GapSize;
-			DrawPowerUp(pBlock->powerup, x,y,w,h);
+			DrawPowerUp(pBlock->powerup, x,y, (pBlock->id > 8));
 		}
 	}
 }
-
-void Game::DrawPowerUp(PowerupType powerup, int x, int y, int w, int h)
+void Game::UpdateAnimations()
 {
+	FireAnimation.Update();
+}
+
+
+#ifdef bals
+void Game::DrawPowerUp(PowerupType powerup, int x, int y, bool isShadow){}
+#endif
+void Game::DrawPowerUp(PowerupType powerup, int x, int y, bool isShadow)
+{
+
+	Color color;
+	if (isShadow)
+	{
+		color = {255, 255, 255, shadow;
+	}
+	else
+	{
+		color = {255, 255, 255, normal;
+	}
 	switch (powerup)
 	{
 	case BlockNormal:
-		DrawTexture(NormalPowerup, x, y, WHITE);
+		DrawTexture(NormalPowerup, x, y, color);
 		break;
 	case BlockFreeze:
-		DrawTexture(FreezePowerup, x, y, WHITE);
+		DrawTexture(FreezePowerup, x, y, color);
 		break;
 	case BlockBomb:
-		DrawTexture(BombPowerup, x, y, WHITE);
+		DrawTexture(BombPowerup, x, y, color);
 		break;
 	case BlockLineBomb:
-		DrawTexture(LineBombPowerup, x, y, WHITE);
+		DrawTexture(LineBombPowerup, x, y, color);
 		break;
 	case BlockColorBomb:
-		DrawTexture(ColorBombPowerup, x, y, WHITE);
+		DrawTexture(ColorBombPowerup, x, y, color);
+		break;
+	case BlockFire:
+		FireAnimation.Draw(x,y ,color);
+		//DrawTextureRec(FirePowerup, frameRec, {static_cast<float>(x),static_cast<float>(y) }, color);
+		//DrawTexture(FirePowerup, x, y, color);
 		break;
 	default:
 		break;
@@ -175,10 +213,8 @@ void Game::DrawGrid()
 			PowerupType cellValue = grid.powerups[r][c];
 			int x = c * CellSize + GapSize + OffSet;
 			int y = (r - BufferRows) * CellSize + GapSize + OffSet;
-			int w = CellSize - GapSize;
-			int h = CellSize - GapSize;
 
-			DrawPowerUp(cellValue, x, y, w, h);
+			DrawPowerUp(cellValue, x, y, false);
 		}
 	}
 }

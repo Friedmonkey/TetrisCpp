@@ -51,6 +51,7 @@ int main()
 		UpdateMusicStream(game.music);
 		// updating
 
+		game.UpdateAnimations();
 		game.HandleInput();
 
 		if (TickGameSpeed(0.2))

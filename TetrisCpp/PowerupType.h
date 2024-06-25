@@ -7,4 +7,5 @@ enum PowerupType
 	BlockBomb,
 	BlockLineBomb,
 	BlockColorBomb,
+	BlockFire,
 };

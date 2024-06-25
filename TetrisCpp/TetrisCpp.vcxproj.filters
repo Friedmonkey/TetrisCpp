@@ -33,6 +33,9 @@
     <ClCompile Include="Game.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="FriedAnimatedTexure.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Settings.h">
@@ -54,6 +57,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PowerupType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FriedAnimatedTexure.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

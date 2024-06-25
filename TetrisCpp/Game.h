@@ -1,6 +1,7 @@
 #pragma once
 #include "Grid.h"
 #include "Blocks.cpp"
+#include "FriedAnimatedTexure.h"
 
 class Game
 {
@@ -9,6 +10,8 @@ public:
 	~Game();
 	void Draw();
 	void HandleInput();
+	void UpdateAnimations();
+
 	void HandleMovement();
 	void MoveBlockDown();
 	void DropBlockDown();
@@ -32,7 +35,7 @@ private:
 
 	void DrawBlock(Block* pBlock);
 	void DrawBlockUI(Block* pBlock, int offX, int offY);
-	void DrawPowerUp(PowerupType powerup, int x, int y, int w, int h);
+	void DrawPowerUp(PowerupType powerup, int x, int y, bool isShadow);
 	void DrawGrid();
 
 
@@ -51,6 +54,9 @@ private:
 	Texture2D BombPowerup;
 	Texture2D LineBombPowerup;
 	Texture2D ColorBombPowerup;
+
+	Texture2D FirePowerup;
+	FriedAnimatedTexure FireAnimation;
 
 	Grid grid;
 	std::vector<Block> blocks;
