@@ -328,8 +328,18 @@ void Game::Draw()
 {
 	DrawGrid();
 
-	DrawBlock(&currentBlock);
-	DrawBlock(&currentBlockShadow);
+	if (sandBlockSplitted)
+	{
+		for (Block block : currentBlocks)
+		{
+			DrawBlock(&block);
+		}
+	}
+	else
+	{
+		DrawBlock(&currentBlock);
+		DrawBlock(&currentBlockShadow);
+	}
 	switch (nextBlock.id)
 	{
 	case 3: //i block
@@ -349,7 +359,7 @@ void Game::Draw()
 
 void Game::HandleMovement()
 {
-	if (gameOver || paused)
+	if (gameOver || sandBlockSplitted)
 	{
 		return;
 	}
@@ -378,16 +388,17 @@ void Game::HandleInput()
 {
 	int keyPressed = GetKeyPressed();
 
-	if (keyPressed == KEY_P)
+
+	if (keyPressed == KEY_H)
 	{
-		paused = !paused;
+		currentBlock.powerup = BlockSand;
 	}
 	if (keyPressed == KEY_U)
 	{
 		Reset();
 	}
 
-	if (gameOver || paused)
+	if (gameOver || sandBlockSplitted)
 	{
 		return;
 	}
@@ -429,7 +440,7 @@ void Game::Move(int rows, int columns)
 
 void Game::MoveBlockLeft()
 {
-	if (gameOver || paused)
+	if (gameOver || sandBlockSplitted)
 	{
 		return;
 	}
@@ -443,7 +454,7 @@ void Game::MoveBlockLeft()
 
 void Game::MoveBlockRight()
 {
-	if (gameOver || paused)
+	if (gameOver || sandBlockSplitted)
 	{
 		return;
 	}
@@ -457,7 +468,7 @@ void Game::MoveBlockRight()
 
 void Game::DropBlockDown()
 {
-	if (gameOver || paused)
+	if (gameOver || sandBlockSplitted)
 	{
 		return;
 	}
@@ -476,21 +487,51 @@ void Game::DropBlockDown()
 
 void Game::MoveBlockDown()
 {
-	if (gameOver || paused)
+	if (gameOver)
 	{
 		return;
 	}
-	Move(1, 0);
-	if (IsBlockOutside(&currentBlock) || !BlockFits(&currentBlock))
+	if (sandBlockSplitted)
 	{
-		Move(-1, 0);
-		LockBlock();
+		for (auto it = currentBlocks.begin(); it != currentBlocks.end();)
+		{
+			it->Move(1, 0);
+
+			if (IsBlockOutside(&(*it)) || !BlockFits(&(*it)))
+			{
+				it->Move(-1, 0);
+				sandBlocksLocked++;
+				for (Position item : it->GetCellPositions())
+				{
+					grid.grid[item.row][item.column] = it->id;
+					grid.powerups[item.row][item.column] = it->powerup;
+				}
+				it = currentBlocks.erase(it); // Erase and get the next iterator
+			}
+			else
+			{
+				++it;
+			}
+		}
+		if (currentBlocks.empty())
+		{
+			LockBlock();
+		}
+	}
+	else
+	{
+		Move(1, 0);
+		if (IsBlockOutside(&currentBlock) || !BlockFits(&currentBlock))
+		{
+			Move(-1, 0);
+			LockBlock();
+		}
 	}
 }
 
 void Game::RotateLeft()
 {
-	if (gameOver || paused)
+	if (gameOver || sandBlockSplitted)
 	{
 		return;
 	}
@@ -509,7 +550,7 @@ void Game::RotateLeft()
 
 void Game::RotateRight()
 {
-	if (gameOver || paused)
+	if (gameOver || sandBlockSplitted)
 	{
 		return;
 	}
@@ -619,21 +660,39 @@ bool Game::SRSRotateLeft(Block* pBlock)
 void Game::LockBlock()
 {
 	std::vector<Position> tiles = currentBlock.GetCellPositions();
-	if (currentBlock.powerup == BlockSand)
+
+	if (!sandBlockSplitted)
 	{
-		currentBlocks = std::vector<Block>();
-		for (auto tile : tiles)
+		if (currentBlock.powerup == BlockSand)
 		{
-			Block tileBlock = DBlock();
-			currentBlocks.push_back(tileBlock);
+			// Sort the vector using std::sort and the custom comparator
+			std::sort(tiles.begin(), tiles.end(), [](Position& a, Position& b) { return a.row > b.row; });
+
+			currentBlocks = std::vector<Block>();
+			for (auto tile : tiles)
+			{
+				Block tileBlock = DBlock();
+				tileBlock.rowOffset = tile.row;
+				tileBlock.colummnOffset = tile.column;
+				tileBlock.id = currentBlock.id;
+				tileBlock.powerup = currentBlock.powerup;
+				currentBlocks.push_back(tileBlock);
+			}
+			sandBlockSplitted = true;
+			sandBlocksLocked = 0;
+			return;
+		}
+
+		for (Position item : tiles)
+		{
+			grid.grid[item.row][item.column] = currentBlock.id;
+			grid.powerups[item.row][item.column] = currentBlock.powerup;
 		}
 	}
-	for (Position item: tiles)
+	else
 	{
-		grid.grid[item.row][item.column] = currentBlock.id;
-		grid.powerups[item.row][item.column] = currentBlock.powerup;
+		sandBlockSplitted = false;
 	}
-
 	currentBlock = nextBlock;
 	ApplyShadow();
 	if (!BlockFits(&currentBlock))
@@ -690,7 +749,7 @@ void Game::Reset()
 	grid.Initialize();
 	gameSpeed = baseSpeed;
 	gameOver = false;
-	paused = false;
+	sandBlockSplitted = false;
 	blocks = GetAllBlocks();
 	currentBlock = GetRandomBlock();
 	nextBlock = GetRandomBlock();

@@ -23,7 +23,6 @@ public:
 	void DropBlockDown();
 	bool gameOver;
 	bool powerupsEnabled = false;
-	bool paused;
 	int score;
 	float gameSpeed = baseSpeed;
 	Music music;
@@ -76,6 +75,8 @@ private:
 	std::vector<Block> blocks;
 	Block currentBlock;
 	std::vector<Block> currentBlocks;
+	bool sandBlockSplitted;
+	int sandBlocksLocked = 0;
 	Block currentBlockShadow;
 	Block nextBlock;
 
