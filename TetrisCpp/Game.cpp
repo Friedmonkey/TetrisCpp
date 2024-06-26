@@ -42,8 +42,10 @@ Game::Game()
 	LoadPowerup(BombPowerup);
 	LoadPowerup(LineBombPowerup);
 	LoadPowerup(ColorBombPowerup);
+	LoadPowerup(SandPowerup);
 
 	LoadAnimiatedPowerup(FirePowerup, 32, 1); //uses Atlas.png
+
 
 	FireAnimation = FriedAnimatedTexure(&FirePowerup, 32, 1);
 
@@ -60,6 +62,8 @@ Game::~Game()
 	UnloadTexture(BombPowerup);
 	UnloadTexture(LineBombPowerup);
 	UnloadTexture(ColorBombPowerup);
+	UnloadTexture(SandPowerup);
+
 	UnloadTexture(FirePowerup);
 
 	UnloadSound(rotateSound);
@@ -129,8 +133,8 @@ Block Game::GetRandomBlock()
 
 
 	PowerupType powerup {BlockNormal};
-	int randomPowerup = GetRandomValue(0,10);
-	if (randomPowerup <= 5)
+	int randomPowerup = GetRandomValue(0,12);
+	if (randomPowerup <= AmountPowerups)
 	{
 		powerup = static_cast<PowerupType>(randomPowerup);
 	}
@@ -224,6 +228,9 @@ void Game::DrawPowerUp(PowerupType powerup, int x, int y, bool isShadow)
 		FireAnimation.Draw(x,y ,color);
 		//DrawTextureRec(FirePowerup, frameRec, {static_cast<float>(x),static_cast<float>(y) }, color);
 		//DrawTexture(FirePowerup, x, y, color);
+		break;
+	case BlockSand:
+		DrawTexture(SandPowerup, x, y, color);
 		break;
 	default:
 		break;
@@ -612,6 +619,15 @@ bool Game::SRSRotateLeft(Block* pBlock)
 void Game::LockBlock()
 {
 	std::vector<Position> tiles = currentBlock.GetCellPositions();
+	if (currentBlock.powerup == BlockSand)
+	{
+		currentBlocks = std::vector<Block>();
+		for (auto tile : tiles)
+		{
+			Block tileBlock = DBlock();
+			currentBlocks.push_back(tileBlock);
+		}
+	}
 	for (Position item: tiles)
 	{
 		grid.grid[item.row][item.column] = currentBlock.id;

@@ -31,7 +31,7 @@
 #define white Color { 255, 255, 255,
 
 #define cnormal 255 }
-#define cshadow 80 }
+#define cshadow 100 }
 
 
 

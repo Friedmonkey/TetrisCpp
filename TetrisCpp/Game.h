@@ -66,13 +66,16 @@ private:
 	Texture2D BombPowerup;
 	Texture2D LineBombPowerup;
 	Texture2D ColorBombPowerup;
+	Texture2D SandPowerup;
 
 	Texture2D FirePowerup;
 	FriedAnimatedTexure FireAnimation;
 
+
 	Grid grid;
 	std::vector<Block> blocks;
 	Block currentBlock;
+	std::vector<Block> currentBlocks;
 	Block currentBlockShadow;
 	Block nextBlock;
 

@@ -8,4 +8,7 @@ enum PowerupType
 	BlockLineBomb,
 	BlockColorBomb,
 	BlockFire,
+	BlockSand,
 };
+
+#define AmountPowerups 6
