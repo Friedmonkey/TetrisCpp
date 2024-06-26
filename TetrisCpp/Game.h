@@ -13,6 +13,10 @@ public:
 	void UpdateAnimations();
 	void PlayClick();
 	void PlayLock();
+	void DrawGridMenu(bool powerups, int xOffset, int yOffset);
+	void TitleGrid();
+
+	void Reset();
 
 	void HandleMovement();
 	void MoveBlockDown();
@@ -32,6 +36,8 @@ private:
 	void MoveBlockRight();
 	void RotateLeft();
 	void RotateRight();
+	void DrawGrid();
+
 
 	bool SRSRotateLeft(Block* pBlock);
 	bool SRSRotateRight(Block *pBlock);
@@ -41,13 +47,11 @@ private:
 	void DrawBlock(Block* pBlock);
 	void DrawBlockUI(Block* pBlock, int offX, int offY);
 	void DrawPowerUp(PowerupType powerup, int x, int y, bool isShadow);
-	void DrawGrid();
 
 
 	bool IsBlockOutside(Block* pBlock);
 	bool BlockFits(Block* pBlock);
 	void LockBlock();
-	void Reset();
 	void UpdateScore(int linesCleared, int moveDownPoints);
 	void ApplyShadow();
 

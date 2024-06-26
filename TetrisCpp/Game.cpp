@@ -230,6 +230,33 @@ void Game::DrawPowerUp(PowerupType powerup, int x, int y, bool isShadow)
 	}
 }
 
+void Game::DrawGridMenu(bool powerups, int xOffset, int yOffset)
+{
+	for (size_t r = BufferRows; r < Rows; r++)
+	{
+		for (size_t c = 0; c < Columns; c++)
+		{
+			int cellValue = grid.grid[r][c];
+			int x = c * CellSize + GapSize + OffSet;
+			int y = (r - BufferRows) * CellSize + GapSize + OffSet;
+
+			x += xOffset;
+			y += yOffset;
+			cellValue += 9;
+
+			int w = CellSize - GapSize;
+			int h = CellSize - GapSize;
+			DrawRectangle(x, y, w, h, currentBlock.colors[cellValue]);
+
+			if (powerups)
+			{
+				PowerupType cellValue = grid.powerups[r][c];
+				DrawPowerUp(cellValue, x, y, true);
+			}
+		}
+	}
+}
+
 void Game::DrawGrid()
 {
 	grid.Draw();
@@ -245,6 +272,49 @@ void Game::DrawGrid()
 			DrawPowerUp(cellValue, x, y, false);
 		}
 	}
+}
+
+void Game::TitleGrid()
+{
+	Reset();
+	powerupsEnabled = true;
+
+	for (size_t i = 0; i < 20; i++)
+	{
+		currentBlock = GetRandomBlock();
+		if (currentBlock.id == 8) //skip the single block
+		{
+			i--;
+			continue;
+		}
+
+		int directionChoise[2]{ -1, 1 };
+		int direction = directionChoise[GetRandomValue(0,1)];
+		int cells = GetRandomValue(0, Columns/2);
+
+		if (direction > 0)
+		{
+			RotateRight();
+			for (size_t j = 0; j < cells; j++)
+			{
+				MoveBlockRight();
+			}
+		}
+		else
+		{
+			RotateLeft();
+			for (size_t j = 0; j < cells; j++)
+			{
+				MoveBlockLeft();
+			}
+		}
+
+		ApplyShadow();
+		DropBlockDown();
+		LockBlock();
+	}
+
+	powerupsEnabled = false;
 }
 
 void Game::Draw()

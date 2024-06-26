@@ -285,6 +285,7 @@
     <ClInclude Include="Block.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Grid.h" />
+    <ClInclude Include="MenuPage.h" />
     <ClInclude Include="Position.h" />
     <ClInclude Include="PowerupType.h" />
     <ClInclude Include="resource.h" />

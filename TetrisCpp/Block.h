@@ -23,7 +23,7 @@ public:
 	int rowOffset;
 	int colummnOffset;
 	PowerupType powerup;
-private:
 	std::vector<Color> colors;
+private:
 };
 
