@@ -391,7 +391,7 @@ void Game::HandleInput()
 
 	if (keyPressed == KEY_H)
 	{
-		currentBlock.powerup = BlockSand;
+		currentBlock.powerup = BlockLineBomb;
 	}
 	if (keyPressed == KEY_U)
 	{
@@ -682,11 +682,27 @@ void Game::LockBlock()
 			sandBlocksLocked = 0;
 			return;
 		}
-
-		for (Position item : tiles)
+		else if (currentBlock.powerup == BlockLineBomb)
 		{
-			grid.grid[item.row][item.column] = currentBlock.id;
-			grid.powerups[item.row][item.column] = currentBlock.powerup;
+			std::vector<int> rows = std::vector<int>();
+			for (Position item : tiles)
+			{
+				if (!(std::find(rows.begin(), rows.end(), item.row) != rows.end()))
+				{
+					rows.push_back(item.row);
+				}
+				grid.grid[item.row][item.column] = currentBlock.id;
+				grid.powerups[item.row][item.column] = currentBlock.powerup;
+			}
+			grid.LineClearBombRows(rows);
+		}
+		else
+		{
+			for (Position item : tiles)
+			{
+				grid.grid[item.row][item.column] = currentBlock.id;
+				grid.powerups[item.row][item.column] = currentBlock.powerup;
+			}
 		}
 	}
 	else

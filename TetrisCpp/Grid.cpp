@@ -58,6 +58,24 @@ int Grid::ClearFullRows()
 	return completed;
 }
 
+int Grid::LineClearBombRows(std::vector<int> rows)
+{
+	int completed{ 0 };
+	for (int row = (Rows - 1); row >= 0; row--)
+	{
+		if (std::find(rows.begin(), rows.end(), row) != rows.end())
+		{
+			ClearRow(row);
+			completed++;
+		}
+		else if (completed > 0)
+		{
+			MoveRowDown(row, completed);
+		}
+	}
+	return completed;
+}
+
 bool Grid::IsRowFull(int row)
 {
 	for (size_t column = 0; column < Columns; column++)

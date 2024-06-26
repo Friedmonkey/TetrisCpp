@@ -11,6 +11,7 @@ public:
 	bool IsCellOutside(int row, int column);
 	bool IsCellEmpty(int row, int column);
 	int ClearFullRows();
+	int LineClearBombRows(std::vector<int> rows);
 	int grid[Rows][Columns];
 	PowerupType powerups[Rows][Columns];
 private:
