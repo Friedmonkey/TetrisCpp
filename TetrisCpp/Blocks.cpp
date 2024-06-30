@@ -176,7 +176,7 @@ public:
 	DBlock()
 	{
 		id = 8; //white
-		cells[0] = { pos(0,1) };
+		cells[0] = { pos(0,0) };
 		//cells[1] = { pos(0,0), pos(0,1), pos(1,0), pos(1,1) };
 		//cells[2] = { pos(0,0), pos(0,1), pos(1,0), pos(1,1) };
 		//cells[3] = { pos(0,0), pos(0,1), pos(1,0), pos(1,1) };

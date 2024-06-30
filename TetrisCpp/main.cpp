@@ -195,8 +195,10 @@ void DrawBackButton(Game* pGame, const Font* pFont, bool gamed = false)
 		checkHover(pGame, &hoverBack);
 		if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) //if you clicked
 		{
+
 			Menu = true;
 			menuPage = MenuMain;
+			pGame->PlayLock();
 			if (gamed)
 			{
 				pGame->TitleGrid();
@@ -327,6 +329,7 @@ void HandleMenuLogic(Game* pGame, const Font* pFont)
 		checkHover(pGame, &hoverMain);
 		if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) //if you clicked
 		{
+			pGame->PlayLock();
 			menuPage = MenuControls;
 			return;
 		}
@@ -336,6 +339,7 @@ void HandleMenuLogic(Game* pGame, const Font* pFont)
 		checkHover(pGame, &hoverMain);
 		if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) //if you clicked
 		{
+			pGame->PlayLock();
 			menuPage = MenuHighscores;
 			return;
 		}
@@ -357,6 +361,9 @@ void HandleControlsMenuLogic(Game* pGame, const Font* pFont)
 
 	WriteCenter("Use the up arrow to rotate the pice", 350, pFont, 25, 2, WHITE);
 	WriteCenter("clockwise, or use q/e to rotate other", 375, pFont, 25, 2, WHITE);
+
+	WriteCenter("Use any shift or control key to speed up", 425, pFont, 25, 2, WHITE);
+	WriteCenter("hold the key down to go faster", 450, pFont, 25, 2, WHITE);
 }
 
 

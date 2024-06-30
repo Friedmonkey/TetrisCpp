@@ -36,6 +36,8 @@ Game::Game()
 	cantSound = LoadSound("Assets/Audio/cant.wav");
 	clickSound = LoadSound("Assets/Audio/click.wav");
 
+	sandSound = LoadSound("Assets/Audio/sand.wav");
+	SetSoundVolume(sandSound, 5);
 
 	LoadPowerup(NormalPowerup);
 	LoadPowerup(FreezePowerup);
@@ -74,6 +76,9 @@ Game::~Game()
 	UnloadSound(lockSound);
 	UnloadSound(cantSound);
 	UnloadSound(clickSound);
+
+	UnloadSound(sandSound);
+
 	UnloadMusicStream(music);
 	CloseAudioDevice();
 }
@@ -328,8 +333,18 @@ void Game::Draw()
 {
 	DrawGrid();
 
-	DrawBlock(&currentBlock);
-	DrawBlock(&currentBlockShadow);
+	if (sandBlockSplitted)
+	{
+		for (Block block : currentBlocks)
+		{
+			DrawBlock(&block);
+		}
+	}
+	else
+	{
+		DrawBlock(&currentBlock);
+		DrawBlock(&currentBlockShadow);
+	}
 	switch (nextBlock.id)
 	{
 	case 3: //i block
@@ -349,7 +364,7 @@ void Game::Draw()
 
 void Game::HandleMovement()
 {
-	if (gameOver || paused)
+	if (gameOver || sandBlockSplitted)
 	{
 		return;
 	}
@@ -378,16 +393,17 @@ void Game::HandleInput()
 {
 	int keyPressed = GetKeyPressed();
 
-	if (keyPressed == KEY_P)
+
+	if (keyPressed == KEY_H)
 	{
-		paused = !paused;
+		currentBlock.powerup = BlockSand;
 	}
 	if (keyPressed == KEY_U)
 	{
 		Reset();
 	}
 
-	if (gameOver || paused)
+	if (gameOver || sandBlockSplitted)
 	{
 		return;
 	}
@@ -429,7 +445,7 @@ void Game::Move(int rows, int columns)
 
 void Game::MoveBlockLeft()
 {
-	if (gameOver || paused)
+	if (gameOver || sandBlockSplitted)
 	{
 		return;
 	}
@@ -443,7 +459,7 @@ void Game::MoveBlockLeft()
 
 void Game::MoveBlockRight()
 {
-	if (gameOver || paused)
+	if (gameOver || sandBlockSplitted)
 	{
 		return;
 	}
@@ -457,7 +473,7 @@ void Game::MoveBlockRight()
 
 void Game::DropBlockDown()
 {
-	if (gameOver || paused)
+	if (gameOver || sandBlockSplitted)
 	{
 		return;
 	}
@@ -476,21 +492,52 @@ void Game::DropBlockDown()
 
 void Game::MoveBlockDown()
 {
-	if (gameOver || paused)
+	if (gameOver)
 	{
 		return;
 	}
-	Move(1, 0);
-	if (IsBlockOutside(&currentBlock) || !BlockFits(&currentBlock))
+	if (sandBlockSplitted)
 	{
-		Move(-1, 0);
-		LockBlock();
+		for (auto it = currentBlocks.begin(); it != currentBlocks.end();)
+		{
+			it->Move(1, 0);
+
+			if (IsBlockOutside(&(*it)) || !BlockFits(&(*it)))
+			{
+				it->Move(-1, 0);
+				sandBlocksLocked++;
+				for (Position item : it->GetCellPositions())
+				{
+					grid.grid[item.row][item.column] = it->id;
+					grid.powerups[item.row][item.column] = it->powerup;
+				}
+				it = currentBlocks.erase(it); // Erase and get the next iterator
+			}
+			else
+			{
+				PlaySound(sandSound);
+				++it;
+			}
+		}
+		if (currentBlocks.empty())
+		{
+			LockBlock();
+		}
+	}
+	else
+	{
+		Move(1, 0);
+		if (IsBlockOutside(&currentBlock) || !BlockFits(&currentBlock))
+		{
+			Move(-1, 0);
+			LockBlock();
+		}
 	}
 }
 
 void Game::RotateLeft()
 {
-	if (gameOver || paused)
+	if (gameOver || sandBlockSplitted)
 	{
 		return;
 	}
@@ -509,7 +556,7 @@ void Game::RotateLeft()
 
 void Game::RotateRight()
 {
-	if (gameOver || paused)
+	if (gameOver || sandBlockSplitted)
 	{
 		return;
 	}
@@ -686,8 +733,6 @@ void Game::LockBlock()
 		else if (currentBlock.powerup == BlockFire)
 		{
 			std::vector<Position> foundPositions = CheckNeigbors(&currentBlock);
-
-
 			std::vector<int> rows = std::vector<int>();
 			for (Position item : tiles)
 			{
@@ -726,8 +771,13 @@ void Game::LockBlock()
 	nextBlock = GetRandomBlock();
 
 	int rowsCleared = grid.ClearFullRows();
+	ApplyClearPoints(rowsCleared);
+}
+
+void Game::ApplyClearPoints(int rowsCleared)
+{
 	UpdateGameSpeed(rowsCleared);
-	UpdateScore(rowsCleared,0);
+	UpdateScore(rowsCleared, 0);
 	if (rowsCleared > 2)
 	{
 		PlaySound(winSound);
@@ -770,7 +820,7 @@ void Game::Reset()
 	grid.Initialize();
 	gameSpeed = baseSpeed;
 	gameOver = false;
-	paused = false;
+	sandBlockSplitted = false;
 	blocks = GetAllBlocks();
 	currentBlock = GetRandomBlock();
 	nextBlock = GetRandomBlock();

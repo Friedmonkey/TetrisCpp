@@ -23,7 +23,6 @@ public:
 	void DropBlockDown();
 	bool gameOver;
 	bool powerupsEnabled = false;
-	bool paused;
 	int score;
 	float gameSpeed = baseSpeed;
 	Music music;
@@ -56,6 +55,7 @@ private:
 	void LockBlock();
 	void UpdateScore(int linesCleared, int moveDownPoints);
 	void ApplyShadow();
+	void ApplyClearPoints(int rowsCleared);
 
 	void DropShadow();
 
@@ -78,8 +78,12 @@ private:
 	std::vector<Block> blocks;
 	Block currentBlock;
 	std::vector<Block> currentBlocks;
+	bool sandBlockSplitted;
+	int sandBlocksLocked = 0;
 	Block currentBlockShadow;
 	Block nextBlock;
+
+	Sound sandSound;
 
 	Sound rotateSound;
 	Sound clearSound;
