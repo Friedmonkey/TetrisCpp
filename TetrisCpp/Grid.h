@@ -1,6 +1,7 @@
 #pragma once
 #include "Settings.h"
 #include "PowerupType.h"
+#include "Position.h"
 
 class Grid
 {
@@ -14,6 +15,8 @@ public:
 	int LineClearBombRows(std::vector<int> rows);
 	int grid[Rows][Columns];
 	PowerupType powerups[Rows][Columns];
+	std::vector<Position> FindConnectedTNT(int startRow, int startColumn, PowerupType targetPowerup);
+	void FloodFillTNT(std::vector<Position>& connectedBlocks, int row, int column, PowerupType targetPowerup, std::vector<std::vector<bool>>& visited);
 private:
 	bool IsRowFull(int row);
 	void ClearRow(int row);

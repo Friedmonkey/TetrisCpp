@@ -55,6 +55,10 @@ int Grid::ClearFullRows()
 			MoveRowDown(row, completed);
 		}
 	}
+	if (completed > 0)
+	{
+		//FindConnectedTNT()
+	}
 	return completed;
 }
 
@@ -65,7 +69,12 @@ int Grid::LineClearBombRows(std::vector<int> rows)
 	{
 		if (std::find(rows.begin(), rows.end(), row) != rows.end())
 		{
-			ClearRow(row);
+			for (size_t column = 0; column < Columns; column++)
+			{
+				grid[row][column] = 0;
+
+				powerups[row][column] = BlockNormal;
+			}
 			completed++;
 		}
 		else if (completed > 0)
@@ -121,5 +130,42 @@ void Grid::Initialize()
 			grid[r][c] = 0;
 			powerups[r][c] = BlockNormal;
 		}
+	}
+}
+
+std::vector<Position> Grid::FindConnectedTNT(int startRow, int startColumn, PowerupType targetPowerup) {
+	std::vector<Position> connectedBlocks;
+	std::vector<std::vector<bool>> visited(Rows, std::vector<bool>(Columns, false));
+
+	FloodFillTNT(connectedBlocks, startRow, startColumn, targetPowerup, visited);
+
+	return connectedBlocks;
+}
+
+void Grid::FloodFillTNT(std::vector<Position>& connectedBlocks, int row, int column, PowerupType targetPowerup, std::vector<std::vector<bool>>& visited) {
+	// Directions for checking adjacent cells (up, down, left, right)
+	std::vector<Position> directions = {
+		{1, 0}, {-1, 0}, {0, 1}, {0, -1}
+	};
+
+	// Mark the current cell as visited
+	visited[row][column] = true;
+
+	// Check all four adjacent directions
+	for (auto dir : directions) {
+		int newRow = row + dir.row;
+		int newColumn = column + dir.column;
+
+		// Check if the adjacent cell is within bounds and not visited
+		if (newRow >= 0 && newRow < Rows && newColumn >= 0 && newColumn < Columns
+			&& !visited[newRow][newColumn] && powerups[newRow][newColumn] == targetPowerup) {
+			// Recursively flood fill from the adjacent cell
+			FloodFillTNT(connectedBlocks, newRow, newColumn, targetPowerup, visited);
+		}
+	}
+
+	// Add the current position to connectedBlocks if it matches the target powerup
+	if (powerups[row][column] == targetPowerup) {
+		connectedBlocks.push_back({ row, column });
 	}
 }

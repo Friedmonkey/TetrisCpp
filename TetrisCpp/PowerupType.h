@@ -2,13 +2,17 @@
 
 enum PowerupType
 {
+	BlockLineBombUp,
+	BlockLineBombRight,
+	BlockLineBombDown,
+	BlockLineBombLeft,
 	BlockNormal,
 	BlockFreeze,
 	BlockBomb,
-	BlockLineBomb,
-	BlockColorBomb,
+	BlockMagic,
 	BlockFire,
 	BlockSand,
+
 };
 
-#define AmountPowerups 6
+#define AmountPowerups 10

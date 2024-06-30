@@ -1,6 +1,7 @@
 #include "Game.h"
 #include <random>
 #include <cmath>
+#include <iostream>
 
 #define LoadPowerup(name) \
 Image image##name = LoadImage("Assets/Images/" #name ".png"); \
@@ -42,9 +43,10 @@ Game::Game()
 	LoadPowerup(NormalPowerup);
 	LoadPowerup(FreezePowerup);
 	LoadPowerup(BombPowerup);
-	LoadPowerup(LineBombPowerup);
-	LoadPowerup(ColorBombPowerup);
+	LoadPowerup(MagicPowerup);
 	LoadPowerup(SandPowerup);
+	LoadPowerup(LineBombPowerup);
+
 
 	LoadAnimiatedPowerup(FirePowerup, 32, 1); //uses Atlas.png
 
@@ -63,7 +65,7 @@ Game::~Game()
 	UnloadTexture(FreezePowerup);
 	UnloadTexture(BombPowerup);
 	UnloadTexture(LineBombPowerup);
-	UnloadTexture(ColorBombPowerup);
+	UnloadTexture(MagicPowerup);
 	UnloadTexture(SandPowerup);
 
 	UnloadTexture(FirePowerup);
@@ -138,9 +140,13 @@ Block Game::GetRandomBlock()
 
 
 	PowerupType powerup {BlockNormal};
-	int randomPowerup = GetRandomValue(0,12);
+	int randomPowerup = GetRandomValue(3,15);
 	if (randomPowerup <= AmountPowerups)
 	{
+		if (randomPowerup == 3) //its a line clear block, now get a direction
+		{
+			randomPowerup = GetRandomValue(0,3);
+		}
 		powerup = static_cast<PowerupType>(randomPowerup);
 	}
 
@@ -212,6 +218,24 @@ void Game::DrawPowerUp(PowerupType powerup, int x, int y, bool isShadow)
 	{
 		color = {255, 255, 255, cnormal;
 	}
+
+
+
+	Rectangle source{ 0, 0, CellSize - GapSize, CellSize - GapSize };
+	Rectangle destination{ x, y, CellSize - GapSize, CellSize - GapSize };
+
+	float rotation = (int)powerup * 90;
+	Vector2 origin{ 0, 0};  // Center of the texture
+
+	if (powerup == BlockLineBombLeft || powerup == BlockLineBombDown)
+	{
+		origin.x += (CellSize - GapSize);
+	}
+	if (powerup == BlockLineBombRight || powerup == BlockLineBombDown)
+	{
+		origin.y += (CellSize - GapSize);
+	}
+
 	switch (powerup)
 	{
 	case BlockNormal:
@@ -223,11 +247,15 @@ void Game::DrawPowerUp(PowerupType powerup, int x, int y, bool isShadow)
 	case BlockBomb:
 		DrawTexture(BombPowerup, x, y, color);
 		break;
-	case BlockLineBomb:
-		DrawTexture(LineBombPowerup, x, y, color);
+	case BlockLineBombUp:
+	case BlockLineBombRight:
+	case BlockLineBombDown:
+	case BlockLineBombLeft:
+		DrawTexturePro(LineBombPowerup, source, destination, origin, rotation, color);
+		//DrawTextureEx(LineBombPowerup, {static_cast<float>(x), static_cast<float>(y)}, rotation, 1, color);
 		break;
-	case BlockColorBomb:
-		DrawTexture(ColorBombPowerup, x, y, color);
+	case BlockMagic:
+		DrawTexture(MagicPowerup, x, y, color);
 		break;
 	case BlockFire:
 		FireAnimation.Draw(x,y ,color);
@@ -394,9 +422,13 @@ void Game::HandleInput()
 	int keyPressed = GetKeyPressed();
 
 
-	if (keyPressed == KEY_H)
+	if (keyPressed == KEY_B)
 	{
-		currentBlock.powerup = BlockSand;
+		currentBlock.powerup = BlockBomb;
+	}
+	if (keyPressed == KEY_F)
+	{
+		currentBlock.powerup = BlockFire;
 	}
 	if (keyPressed == KEY_U)
 	{
@@ -663,32 +695,6 @@ bool Game::SRSRotateLeft(Block* pBlock)
 	return success;
 }
 
-std::vector<Position> Game::CheckNeigbors(Block *pBlock, const int id, const PowerupType powerup)
-{
-	Position position = pBlock->GetCellPositions().at(0);
-	std::vector<Position> checkedPositions = std::vector<Position>();
-	std::vector<Position> foundPositions = std::vector<Position>();
-	CheckNeigborsRecursive(&foundPositions, &checkedPositions, position, id, powerup);
-
-	return foundPositions;
-}
-
-void Game::CheckNeigborsRecursive(std::vector<Position>* pFoundPositions, std::vector<Position>* pCheckedPositions, Position position, const int id, const PowerupType powerup)
-{
-	//if checked positions contain this position
-	if (std::find((*pCheckedPositions).begin(), (*pCheckedPositions).end(), position) != (*pCheckedPositions).end())
-	{
-		return;
-	}
-
-	bool careAboutId = (id != -1);
-	bool careAboutPowerup = (powerup != BlockNormal);
-
-	if (grid.grid[position.row][position.column])
-
-	pCheckedPositions->push_back(position);
-
-}
 
 void Game::LockBlock()
 {
@@ -696,6 +702,21 @@ void Game::LockBlock()
 
 	if (!sandBlockSplitted)
 	{
+		if (currentBlock.powerup == BlockMagic)
+		{
+			PowerupType powerup{ BlockNormal };
+			int randomPowerup = GetRandomValue(0, AmountPowerups);
+			if (randomPowerup <= AmountPowerups)
+			{
+				powerup = static_cast<PowerupType>(randomPowerup);
+			}
+
+			currentBlock.powerup = powerup;
+			std::cout << "turned into: " << powerup << std::endl;
+			Draw();
+		}
+
+
 		if (currentBlock.powerup == BlockSand)
 		{
 			// Sort the vector using std::sort and the custom comparator
@@ -715,36 +736,71 @@ void Game::LockBlock()
 			sandBlocksLocked = 0;
 			return;
 		}
-		else if (currentBlock.powerup == BlockLineBomb)
+		else if (currentBlock.powerup == BlockLineBombLeft || currentBlock.powerup == BlockLineBombRight || currentBlock.powerup == BlockLineBombUp || currentBlock.powerup == BlockLineBombDown)
 		{
-			std::vector<int> rows = std::vector<int>();
+			Position direction {0, 0};
+			switch (currentBlock.powerup)
+			{
+			case BlockLineBombUp:
+				direction.row = -1;
+				break;
+			case BlockLineBombRight:
+				direction.column = 1;
+				break;
+			case BlockLineBombDown:
+				direction.row = 1;
+				break;
+			case BlockLineBombLeft:
+				direction.column = -1;
+			}
+			std::vector<Position> poses = std::vector<Position>();
 			for (Position item : tiles)
 			{
-				if (!(std::find(rows.begin(), rows.end(), item.row) != rows.end()))
+				Position pos {item.row, item.column};
+				while (!grid.IsCellOutside(pos.row, pos.column))
 				{
-					rows.push_back(item.row);
+					if (grid.grid[pos.row][pos.column] != 0)
+					{
+						grid.grid[pos.row][pos.column] = 0;
+						grid.powerups[pos.row][pos.column] = BlockNormal;
+
+						if (!(std::find(poses.begin(), poses.end(), pos) != poses.end()))
+						{
+							poses.push_back(pos);
+						}
+					}
+
+					pos.row += direction.row;
+					pos.column += direction.column;
 				}
-				grid.grid[item.row][item.column] = currentBlock.id;
-				grid.powerups[item.row][item.column] = currentBlock.powerup;
 			}
-			int linesCleared = grid.LineClearBombRows(rows);
+			float linesCleared = poses.size()/10;
 			ApplyClearPoints(linesCleared);
 		}
 		else if (currentBlock.powerup == BlockFire)
 		{
-			std::vector<Position> foundPositions = CheckNeigbors(&currentBlock);
-			std::vector<int> rows = std::vector<int>();
+			std::vector<Position> totalTnt = std::vector<Position>();
+			for (Position pos : tiles)
+			{
+				std::vector<Position> connectedTNT = grid.FindConnectedTNT(pos.row, pos.column, BlockBomb);
+				// Perform action with connected TNT blocks, such as triggering explosions
+				for (Position tntPos : connectedTNT) {
+					totalTnt.push_back(tntPos);
+					// Trigger the explosion of TNT block at tntPos
+					grid.powerups[tntPos.row][tntPos.column] = BlockNormal;  // Remove the TNT block powerup
+					grid.grid[tntPos.row][tntPos.column] = 0;  // Optionally, clear the grid cell
+					// Add further effects or scoring logic here if needed
+				}
+			}
+			std::cout << "Blew up: " << totalTnt.size() << " tnt's" << std::endl;
+
+			//check if its next to tnt blocks, and get the position of all of those tnt blocks
+			// so we can count the amount and blow them up
 			for (Position item : tiles)
 			{
-				if (!(std::find(rows.begin(), rows.end(), item.row) != rows.end()))
-				{
-					rows.push_back(item.row);
-				}
 				grid.grid[item.row][item.column] = currentBlock.id;
 				grid.powerups[item.row][item.column] = currentBlock.powerup;
 			}
-			int linesCleared = grid.LineClearBombRows(rows);
-			ApplyClearPoints(linesCleared);
 		}
 		else
 		{
