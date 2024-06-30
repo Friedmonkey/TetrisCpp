@@ -616,24 +616,104 @@ bool Game::SRSRotateLeft(Block* pBlock)
 	return success;
 }
 
+std::vector<Position> Game::CheckNeigbors(Block *pBlock, const int id, const PowerupType powerup)
+{
+	Position position = pBlock->GetCellPositions().at(0);
+	std::vector<Position> checkedPositions = std::vector<Position>();
+	std::vector<Position> foundPositions = std::vector<Position>();
+	CheckNeigborsRecursive(&foundPositions, &checkedPositions, position, id, powerup);
+
+	return foundPositions;
+}
+
+void Game::CheckNeigborsRecursive(std::vector<Position>* pFoundPositions, std::vector<Position>* pCheckedPositions, Position position, const int id, const PowerupType powerup)
+{
+	//if checked positions contain this position
+	if (std::find((*pCheckedPositions).begin(), (*pCheckedPositions).end(), position) != (*pCheckedPositions).end())
+	{
+		return;
+	}
+
+	bool careAboutId = (id != -1);
+	bool careAboutPowerup = (powerup != BlockNormal);
+
+	if (grid.grid[position.row][position.column])
+
+	pCheckedPositions->push_back(position);
+
+}
+
 void Game::LockBlock()
 {
 	std::vector<Position> tiles = currentBlock.GetCellPositions();
-	if (currentBlock.powerup == BlockSand)
+
+	if (!sandBlockSplitted)
 	{
-		currentBlocks = std::vector<Block>();
-		for (auto tile : tiles)
+		if (currentBlock.powerup == BlockSand)
 		{
-			Block tileBlock = DBlock();
-			currentBlocks.push_back(tileBlock);
+			// Sort the vector using std::sort and the custom comparator
+			std::sort(tiles.begin(), tiles.end(), [](Position& a, Position& b) { return a.row > b.row; });
+
+			currentBlocks = std::vector<Block>();
+			for (auto tile : tiles)
+			{
+				Block tileBlock = DBlock();
+				tileBlock.rowOffset = tile.row;
+				tileBlock.colummnOffset = tile.column;
+				tileBlock.id = currentBlock.id;
+				tileBlock.powerup = currentBlock.powerup;
+				currentBlocks.push_back(tileBlock);
+			}
+			sandBlockSplitted = true;
+			sandBlocksLocked = 0;
+			return;
+		}
+		else if (currentBlock.powerup == BlockLineBomb)
+		{
+			std::vector<int> rows = std::vector<int>();
+			for (Position item : tiles)
+			{
+				if (!(std::find(rows.begin(), rows.end(), item.row) != rows.end()))
+				{
+					rows.push_back(item.row);
+				}
+				grid.grid[item.row][item.column] = currentBlock.id;
+				grid.powerups[item.row][item.column] = currentBlock.powerup;
+			}
+			int linesCleared = grid.LineClearBombRows(rows);
+			ApplyClearPoints(linesCleared);
+		}
+		else if (currentBlock.powerup == BlockFire)
+		{
+			std::vector<Position> foundPositions = CheckNeigbors(&currentBlock);
+
+
+			std::vector<int> rows = std::vector<int>();
+			for (Position item : tiles)
+			{
+				if (!(std::find(rows.begin(), rows.end(), item.row) != rows.end()))
+				{
+					rows.push_back(item.row);
+				}
+				grid.grid[item.row][item.column] = currentBlock.id;
+				grid.powerups[item.row][item.column] = currentBlock.powerup;
+			}
+			int linesCleared = grid.LineClearBombRows(rows);
+			ApplyClearPoints(linesCleared);
+		}
+		else
+		{
+			for (Position item : tiles)
+			{
+				grid.grid[item.row][item.column] = currentBlock.id;
+				grid.powerups[item.row][item.column] = currentBlock.powerup;
+			}
 		}
 	}
-	for (Position item: tiles)
+	else
 	{
-		grid.grid[item.row][item.column] = currentBlock.id;
-		grid.powerups[item.row][item.column] = currentBlock.powerup;
+		sandBlockSplitted = false;
 	}
-
 	currentBlock = nextBlock;
 	ApplyShadow();
 	if (!BlockFits(&currentBlock))
