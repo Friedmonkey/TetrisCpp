@@ -50,6 +50,8 @@ private:
 
 	bool IsBlockOutside(Block* pBlock);
 	bool BlockFits(Block* pBlock);
+	std::vector<Position> CheckNeigbors(Block *pBlock, const int id = -1, const PowerupType powerup = BlockNormal);
+	void CheckNeigborsRecursive(std::vector<Position>* pFoundPositions, std::vector<Position>* pCheckedPositions, Position position, const int id = -1, const PowerupType powerup = BlockNormal);
 	void LockBlock();
 	void UpdateScore(int linesCleared, int moveDownPoints);
 	void ApplyShadow();
