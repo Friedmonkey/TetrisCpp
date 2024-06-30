@@ -53,6 +53,7 @@ private:
 	void LockBlock();
 	void UpdateScore(int linesCleared, int moveDownPoints);
 	void ApplyShadow();
+	void ApplyClearPoints(int rowsCleared);
 
 	void DropShadow();
 
@@ -79,6 +80,8 @@ private:
 	int sandBlocksLocked = 0;
 	Block currentBlockShadow;
 	Block nextBlock;
+
+	Sound sandSound;
 
 	Sound rotateSound;
 	Sound clearSound;

@@ -36,6 +36,8 @@ Game::Game()
 	cantSound = LoadSound("Assets/Audio/cant.wav");
 	clickSound = LoadSound("Assets/Audio/click.wav");
 
+	sandSound = LoadSound("Assets/Audio/sand.wav");
+	SetSoundVolume(sandSound, 5);
 
 	LoadPowerup(NormalPowerup);
 	LoadPowerup(FreezePowerup);
@@ -74,6 +76,9 @@ Game::~Game()
 	UnloadSound(lockSound);
 	UnloadSound(cantSound);
 	UnloadSound(clickSound);
+
+	UnloadSound(sandSound);
+
 	UnloadMusicStream(music);
 	CloseAudioDevice();
 }
@@ -391,7 +396,7 @@ void Game::HandleInput()
 
 	if (keyPressed == KEY_H)
 	{
-		currentBlock.powerup = BlockLineBomb;
+		currentBlock.powerup = BlockSand;
 	}
 	if (keyPressed == KEY_U)
 	{
@@ -510,6 +515,7 @@ void Game::MoveBlockDown()
 			}
 			else
 			{
+				PlaySound(sandSound);
 				++it;
 			}
 		}
@@ -694,7 +700,23 @@ void Game::LockBlock()
 				grid.grid[item.row][item.column] = currentBlock.id;
 				grid.powerups[item.row][item.column] = currentBlock.powerup;
 			}
-			grid.LineClearBombRows(rows);
+			int linesCleared = grid.LineClearBombRows(rows);
+			ApplyClearPoints(linesCleared);
+		}
+		else if (currentBlock.powerup == BlockLineBomb)
+		{
+			std::vector<int> rows = std::vector<int>();
+			for (Position item : tiles)
+			{
+				if (!(std::find(rows.begin(), rows.end(), item.row) != rows.end()))
+				{
+					rows.push_back(item.row);
+				}
+				grid.grid[item.row][item.column] = currentBlock.id;
+				grid.powerups[item.row][item.column] = currentBlock.powerup;
+			}
+			int linesCleared = grid.LineClearBombRows(rows);
+			ApplyClearPoints(linesCleared);
 		}
 		else
 		{
@@ -721,8 +743,13 @@ void Game::LockBlock()
 	nextBlock = GetRandomBlock();
 
 	int rowsCleared = grid.ClearFullRows();
+	ApplyClearPoints(rowsCleared);
+}
+
+void Game::ApplyClearPoints(int rowsCleared)
+{
 	UpdateGameSpeed(rowsCleared);
-	UpdateScore(rowsCleared,0);
+	UpdateScore(rowsCleared, 0);
 	if (rowsCleared > 2)
 	{
 		PlaySound(winSound);
