@@ -44,6 +44,7 @@ private:
 	bool SRSRotateRight(Block *pBlock);
 
 	void Move(int rows, int columns);
+	void MoveSandBlocksDown();
 
 	void DrawBlock(Block* pBlock);
 	void DrawBlockUI(Block* pBlock, int offX, int offY);
@@ -81,9 +82,8 @@ private:
 	Grid grid;
 	std::vector<Block> blocks;
 	Block currentBlock;
-	std::vector<Block> currentBlocks;
+	std::vector<Block> sandBlocks;
 	bool sandBlockSplitted;
-	int sandBlocksLocked = 0;
 	Block currentBlockShadow;
 	Block nextBlock;
 

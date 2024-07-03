@@ -380,7 +380,7 @@ void Game::Draw()
 
 	if (sandBlockSplitted)
 	{
-		for (Block block : currentBlocks)
+		for (Block block : sandBlocks)
 		{
 			DrawBlock(&block);
 		}
@@ -573,31 +573,7 @@ void Game::MoveBlockDown()
 	}
 	if (sandBlockSplitted)
 	{
-		for (auto it = currentBlocks.begin(); it != currentBlocks.end();)
-		{
-			it->Move(1, 0);
-
-			if (IsBlockOutside(&(*it)) || !BlockFits(&(*it)))
-			{
-				it->Move(-1, 0);
-				sandBlocksLocked++;
-				for (Position item : it->GetCellPositions())
-				{
-					grid.grid[item.row][item.column] = it->id;
-					grid.powerups[item.row][item.column] = it->powerup;
-				}
-				it = currentBlocks.erase(it); // Erase and get the next iterator
-			}
-			else
-			{
-				PlaySound(sandSound);
-				++it;
-			}
-		}
-		if (currentBlocks.empty())
-		{
-			LockBlock();
-		}
+		MoveSandBlocksDown();
 	}
 	else
 	{
@@ -607,6 +583,34 @@ void Game::MoveBlockDown()
 			Move(-1, 0);
 			LockBlock();
 		}
+	}
+}
+void Game::MoveSandBlocksDown()
+{
+	for (auto it = sandBlocks.begin(); it != sandBlocks.end();)
+	{ //for each sand block, move it down
+		it->Move(1, 0);
+
+		if (IsBlockOutside(&(*it)) || !BlockFits(&(*it)))
+		{ //if block is outside or doest fit, move it back
+			it->Move(-1, 0);
+			for (Position item : it->GetCellPositions())
+			{ //it should only have 1 cell but still for good mesure/expanability
+				grid.grid[item.row][item.column] = it->id;
+				grid.powerups[item.row][item.column] = it->powerup;
+			}
+			// the block is now on the grid, we no longer have to worry about it, remove it
+			it = sandBlocks.erase(it); // Erase and get the next iterator
+		}
+		else
+		{
+			PlaySound(sandSound);
+			++it;
+		}
+	}
+	if (sandBlocks.empty())
+	{ //if there are no more sand blocks left, then continue to lock block
+		LockBlock();
 	}
 }
 
@@ -739,9 +743,9 @@ bool Game::SRSRotateLeft(Block* pBlock)
 }
 
 void Game::PowerupMagic(std::vector<Position> &tiles)
-{
+{	//the magic powerup, will squish any blocks in the same column, verry usefull
 	std::vector<int> uniqueColumns = std::vector<int>();
-	for (Position item : tiles)
+	for (Position item : tiles) //put the block on the grid and get all columns it uses
 	{
 		if (std::find(uniqueColumns.begin(), uniqueColumns.end(), item.column) == uniqueColumns.end())
 		{
@@ -773,22 +777,21 @@ void Game::PowerupMagic(std::vector<Position> &tiles)
 	}
 }
 void Game::PowerupSand(std::vector<Position>& tiles)
-{
+{	//handle the sand powerup, split every cell into its own block
 	// Sort the vector using std::sort and the custom comparator
 	std::sort(tiles.begin(), tiles.end(), [](Position& a, Position& b) { return a.row > b.row; });
 
-	currentBlocks = std::vector<Block>();
+	sandBlocks = std::vector<Block>();
 	for (auto tile : tiles)
-	{
-		Block tileBlock = DBlock();
+	{ //for each cell in the block, we add a single cell block/ splitting it up
+		Block tileBlock = DBlock(); // <- single cell block
 		tileBlock.rowOffset = tile.row;
 		tileBlock.colummnOffset = tile.column;
 		tileBlock.id = currentBlock.id;
 		tileBlock.powerup = currentBlock.powerup;
-		currentBlocks.push_back(tileBlock);
+		sandBlocks.push_back(tileBlock);
 	}
 	sandBlockSplitted = true;
-	sandBlocksLocked = 0;
 }
 void Game::PowerupLineBomb(std::vector<Position>& tiles)
 {
@@ -889,10 +892,13 @@ void Game::PowerupExplosion(std::vector<Position>& tiles)
 
 	//check if its next to tnt blocks, and get the position of all of those tnt blocks
 	// so we can count the amount and blow them up
-	for (Position item : tiles)
-	{
-		grid.grid[item.row][item.column] = currentBlock.id;
-		grid.powerups[item.row][item.column] = currentBlock.powerup;
+	if (totalTnt.size() < 0)
+	{	//if we didnt blow up any tnt's we will put the fire on the grid
+		for (Position item : tiles)
+		{
+			grid.grid[item.row][item.column] = currentBlock.id;
+			grid.powerups[item.row][item.column] = currentBlock.powerup;
+		}
 	}
 }
 
@@ -900,8 +906,12 @@ void Game::LockBlock()
 {
 	std::vector<Position> tiles = currentBlock.GetCellPositions();
 
-	if (!sandBlockSplitted)
-	{
+	if (sandBlockSplitted) 
+	{	//if lockblock gets called after the sand was already split
+		sandBlockSplitted = false;
+	}
+	else
+	{	//what to do with this block once its suposed to be locked in place
 		switch (currentBlock.powerup)
 		{
 		case BlockMagic:
@@ -919,31 +929,34 @@ void Game::LockBlock()
 		case BlockFire:
 			PowerupExplosion(tiles);
 			break;
-		default:
-				for (Position item : tiles)
-				{
-					grid.grid[item.row][item.column] = currentBlock.id;
-					grid.powerups[item.row][item.column] = currentBlock.powerup;
-				}
+		default: //default just put the block on the grid
+			for (Position item : tiles)
+			{
+				grid.grid[item.row][item.column] = currentBlock.id;
+				grid.powerups[item.row][item.column] = currentBlock.powerup;
+			}
 			break;
 		}
 	}
-	else
-	{
-		sandBlockSplitted = false;
-	}
+
+	//next block stuff
 	currentBlock = nextBlock;
 	CheckFreezeBlock(&currentBlock);
 	ApplyShadow();
+
+	//game over
 	if (!BlockFits(&currentBlock))
 	{
 		gameOver = true;
 		StopMusicStream(music);
 		PlaySound(loseSound);
 	}
+
+	//put the block and continue
 	PlaySound(lockSound);
 	nextBlock = GetRandomBlock();
 
+	//clear any rows and reward points
 	int rowsCleared = grid.ClearFullRows();
 	ApplyClearPoints(rowsCleared);
 }
