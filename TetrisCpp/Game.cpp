@@ -131,13 +131,13 @@ void Game::CheckFreezeBlock(Block *pBlock)
 {
 	if (pBlock->powerup == BlockFreeze)
 	{
-		pBlock->Move(4, 0);
+		pBlock->Move(3, 0);
 		if (IsBlockOutside(pBlock) || !BlockFits(pBlock))
 		{
-			pBlock->Move(-3, 0);
+			pBlock->Move(-2, 0);
 			if (IsBlockOutside(pBlock) || !BlockFits(pBlock))
 			{
-				pBlock->Move(-3, 0);
+				pBlock->Move(-1, 0);
 				LockBlock();
 			}
 		}
@@ -571,11 +571,7 @@ void Game::MoveBlockDown()
 	{
 		return;
 	}
-	if (sandBlockSplitted)
-	{
-		MoveSandBlocksDown();
-	}
-	else
+	if (!sandBlockSplitted)
 	{
 		Move(1, 0);
 		if (IsBlockOutside(&currentBlock) || !BlockFits(&currentBlock))
@@ -583,6 +579,10 @@ void Game::MoveBlockDown()
 			Move(-1, 0);
 			LockBlock();
 		}
+	}
+	else
+	{
+		MoveSandBlocksDown();
 	}
 }
 void Game::MoveSandBlocksDown()
@@ -776,9 +776,9 @@ void Game::PowerupMagic(std::vector<Position> &tiles)
 		}
 	}
 }
-void Game::PowerupSand(std::vector<Position>& tiles)
+void Game::PowerupSand(std::vector<Position> &tiles)
 {	//handle the sand powerup, split every cell into its own block
-	// Sort the vector using std::sort and the custom comparator
+	// sort so the blocks at the bottom fall first so they dont collide
 	std::sort(tiles.begin(), tiles.end(), [](Position& a, Position& b) { return a.row > b.row; });
 
 	sandBlocks = std::vector<Block>();
@@ -793,7 +793,7 @@ void Game::PowerupSand(std::vector<Position>& tiles)
 	}
 	sandBlockSplitted = true;
 }
-void Game::PowerupLineBomb(std::vector<Position>& tiles)
+void Game::PowerupLineBomb(std::vector<Position> &tiles)
 {
 	Position direction{ 0, 0 };
 	switch (currentBlock.powerup)
@@ -873,7 +873,7 @@ void Game::PowerupLineBomb(std::vector<Position>& tiles)
 		}
 	}
 }
-void Game::PowerupExplosion(std::vector<Position>& tiles)
+void Game::PowerupExplosion(std::vector<Position> &tiles)
 {
 	std::vector<Position> totalTnt = std::vector<Position>();
 	for (Position pos : tiles)
@@ -906,20 +906,16 @@ void Game::LockBlock()
 {
 	std::vector<Position> tiles = currentBlock.GetCellPositions();
 
-	if (sandBlockSplitted) 
-	{	//if lockblock gets called after the sand was already split
-		sandBlockSplitted = false;
-	}
-	else
+	if (!sandBlockSplitted) 
 	{	//what to do with this block once its suposed to be locked in place
 		switch (currentBlock.powerup)
 		{
-		case BlockMagic:
-			PowerupMagic(tiles);
-			break;
 		case BlockSand:
 			PowerupSand(tiles);
 			return;
+		case BlockMagic:
+			PowerupMagic(tiles);
+			break;
 		//case BlockLineBombUp:
 		case BlockLineBombDown:
 		case BlockLineBombLeft:
@@ -937,6 +933,10 @@ void Game::LockBlock()
 			}
 			break;
 		}
+	}
+	else
+	{	//if lockblock gets called after the sand was already split
+		sandBlockSplitted = false;
 	}
 
 	//next block stuff
