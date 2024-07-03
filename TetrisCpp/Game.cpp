@@ -224,7 +224,7 @@ void Game::DrawPowerUp(PowerupType powerup, int x, int y, bool isShadow)
 	Rectangle source{ 0, 0, CellSize - GapSize, CellSize - GapSize };
 	Rectangle destination{ x, y, CellSize - GapSize, CellSize - GapSize };
 
-	float rotation = (int)powerup * 90;
+	float rotation = ((int)powerup+1) * 90;
 	Vector2 origin{ 0, 0};  // Center of the texture
 
 	if (powerup == BlockLineBombLeft || powerup == BlockLineBombDown)
