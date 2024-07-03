@@ -19,6 +19,7 @@ public:
 	void Reset();
 
 	void HandleMovement();
+	bool ShouldMoveBlockDown();
 	void MoveBlockDown();
 	void DropBlockDown();
 	bool gameOver;
@@ -37,6 +38,7 @@ private:
 	void RotateRight();
 	void DrawGrid();
 
+	void CheckFreezeBlock(Block* pBlock);
 
 	bool SRSRotateLeft(Block* pBlock);
 	bool SRSRotateRight(Block *pBlock);

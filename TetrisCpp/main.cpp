@@ -222,7 +222,10 @@ void HandleGameLogic(Game *pGame, const Font *pFont)
 
 	if (TickGameSpeed(pGame->gameSpeed))
 	{
-		pGame->MoveBlockDown();
+		if (pGame->ShouldMoveBlockDown())
+		{
+			pGame->MoveBlockDown();
+		}
 	}
 
 	if (TickMovementSpeed(0.05))

@@ -21,6 +21,7 @@ Game::Game()
 	gameOver = false;
 	blocks = GetAllBlocks();
 	currentBlock = GetRandomBlock();
+	CheckFreezeBlock(&currentBlock);
 	ApplyShadow();
 	nextBlock = GetRandomBlock();
 	InitAudioDevice();
@@ -126,6 +127,23 @@ void Game::UpdateGameSpeed(int linesCleared)
 	}
 }
 
+void Game::CheckFreezeBlock(Block *pBlock)
+{
+	if (pBlock->powerup == BlockFreeze)
+	{
+		pBlock->Move(4, 0);
+		if (IsBlockOutside(pBlock) || !BlockFits(pBlock))
+		{
+			pBlock->Move(-3, 0);
+			if (IsBlockOutside(pBlock) || !BlockFits(pBlock))
+			{
+				pBlock->Move(-3, 0);
+				LockBlock();
+			}
+		}
+		DropShadow();
+	}
+}
 Block Game::GetRandomBlock()
 {
 	if (blocks.empty())
@@ -151,7 +169,6 @@ Block Game::GetRandomBlock()
 	}
 
 	block.powerup = powerup;
-
 	return block;
 }
 
@@ -408,8 +425,14 @@ void Game::HandleMovement()
 			MoveBlockRight();
 			PlaySound(clickSound);
 		}
+		if (!ShouldMoveBlockDown() && IsKeyDown(KEY_DOWN))
+		{
+			UpdateScore(0, 1);
+			MoveBlockDown();
+			PlaySound(clickSound);
+		}
 	}
-	if (IsKeyDown(KEY_DOWN))
+	if (ShouldMoveBlockDown() && IsKeyDown(KEY_DOWN))
 	{
 		UpdateScore(0, 1);
 		MoveBlockDown();
@@ -455,10 +478,14 @@ void Game::HandleInput()
 	case KEY_RIGHT:
 		MoveBlockRight();
 		break;
-	//case KEY_DOWN:
-	//	UpdateScore(0,1);
-	//	MoveBlockDown();
-	//	break;
+	case KEY_DOWN:
+		if (!ShouldMoveBlockDown())
+		{
+			UpdateScore(0, 1);
+			MoveBlockDown();
+			PlaySound(clickSound);
+		}
+		break;
 	case KEY_SPACE:
 		DropBlockDown();
 		break;
@@ -527,8 +554,17 @@ void Game::DropBlockDown()
 	
 	//update the socre by twice the dropdistance because you did it instantly
 	UpdateScore(0, dropDistance * 2);
+
+	if (currentBlock.powerup == BlockFreeze)
+	{
+		LockBlock();
+	}
 }
 
+bool Game::ShouldMoveBlockDown()
+{
+	return currentBlock.powerup != BlockFreeze;
+}
 void Game::MoveBlockDown()
 {
 	if (gameOver)
@@ -897,6 +933,7 @@ void Game::LockBlock()
 		sandBlockSplitted = false;
 	}
 	currentBlock = nextBlock;
+	CheckFreezeBlock(&currentBlock);
 	ApplyShadow();
 	if (!BlockFits(&currentBlock))
 	{
@@ -959,6 +996,7 @@ void Game::Reset()
 	gameOver = false;
 	sandBlockSplitted = false;
 	blocks = GetAllBlocks();
+	CheckFreezeBlock(&currentBlock);
 	currentBlock = GetRandomBlock();
 	nextBlock = GetRandomBlock();
 	ApplyShadow();
