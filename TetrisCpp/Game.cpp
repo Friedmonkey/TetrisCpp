@@ -709,22 +709,56 @@ void Game::LockBlock()
 
 	if (!sandBlockSplitted)
 	{
+
 		if (currentBlock.powerup == BlockMagic)
 		{
-			PowerupType powerup{ BlockNormal };
-			int randomPowerup = GetRandomValue(0, AmountPowerups);
-			if (randomPowerup <= AmountPowerups)
+			std::vector<int> uniqueColumns = std::vector<int>();
+			for (Position item : tiles)
 			{
-				powerup = static_cast<PowerupType>(randomPowerup);
+				if (std::find(uniqueColumns.begin(), uniqueColumns.end(), item.column) == uniqueColumns.end())
+				{
+					uniqueColumns.push_back(item.column);
+				}
+				grid.grid[item.row][item.column] = currentBlock.id;
+				grid.powerups[item.row][item.column] = currentBlock.powerup;
 			}
+			// Drop blocks down to fill gaps
+			for (int col : uniqueColumns)
+			{
+				int emptyRow = Rows - 1; // Start from bottom of the grid
 
-			currentBlock.powerup = powerup;
-			std::cout << "turned into: " << powerup << std::endl;
-			Draw();
+				for (int row = Rows - 1; row >= 0; --row)
+				{
+					if (grid.grid[row][col] != 0)
+					{
+						// Move block down to the first empty row found
+						if (row != emptyRow)
+						{
+							grid.grid[emptyRow][col] = grid.grid[row][col];
+							grid.powerups[emptyRow][col] = grid.powerups[row][col];
+							grid.grid[row][col] = 0;
+							grid.powerups[row][col] = BlockNormal;
+						}
+						emptyRow--;
+					}
+				}
+			}
+			//PowerupType powerup{ BlockNormal };
+			//int randomPowerup = GetRandomValue(0, AmountPowerups);
+			//if (randomPowerup <= AmountPowerups+4)
+			//{
+			//	powerup = static_cast<PowerupType>(randomPowerup);
+			//}
+			//else
+			//{
+			//	powerup = BlockSand;
+			//}
+
+			//currentBlock.powerup = powerup;
+			//std::cout << "turned into: " << powerup << std::endl;
+			//Draw();
 		}
-
-
-		if (currentBlock.powerup == BlockSand)
+		else if (currentBlock.powerup == BlockSand)
 		{
 			// Sort the vector using std::sort and the custom comparator
 			std::sort(tiles.begin(), tiles.end(), [](Position& a, Position& b) { return a.row > b.row; });
@@ -762,9 +796,7 @@ void Game::LockBlock()
 				break;
 			}
 			std::vector<Position> poses;
-			std::vector<int> cols;
 			std::vector<int> rows;
-			std::vector<int> amounts;
 
 			for (Position item : tiles)
 			{
@@ -776,20 +808,11 @@ void Game::LockBlock()
 
 					if (currentBlock.powerup == BlockLineBombLeft || currentBlock.powerup == BlockLineBombRight)
 					{
-						auto indexer = std::find(cols.begin(), cols.end(), pos.column);
-						int index = indexer - cols.begin();
-						if (indexer == cols.end())
+						auto indexer = std::find(rows.begin(), rows.end(), pos.row);
+						int index = indexer - rows.begin();
+						if (indexer == rows.end())
 						{
-							cols.push_back(pos.column);
 							rows.push_back(pos.row);
-							amounts.push_back(1);
-						}
-						else
-						{
-							if (index < cols.size())
-							{
-								amounts.at(index)++;
-							}
 						}
 					}
 
@@ -813,7 +836,13 @@ void Game::LockBlock()
 
 				for (int row = Rows - 1; row >= 0; --row)
 				{
-					if (grid.grid[row][col] != 0)
+					bool moveZero = true;
+					if (!(std::find(rows.begin(), rows.end(), row) == rows.end()))
+					{
+						//if this row does not exist, we dont move zero
+						moveZero = false;
+					}
+					if (grid.grid[row][col] != 0 || moveZero)
 					{
 						// Move block down to the first empty row found
 						if (row != emptyRow)
