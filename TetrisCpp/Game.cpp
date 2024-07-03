@@ -140,12 +140,12 @@ Block Game::GetRandomBlock()
 
 
 	PowerupType powerup {BlockNormal};
-	int randomPowerup = GetRandomValue(3,15);
+	int randomPowerup = GetRandomValue(2,15);
 	if (randomPowerup <= AmountPowerups)
 	{
-		if (randomPowerup == 3) //its a line clear block, now get a direction
+		if (randomPowerup == 2) //its a line clear block, now get a direction
 		{
-			randomPowerup = GetRandomValue(0,3);
+			randomPowerup = GetRandomValue(0,2);
 		}
 		powerup = static_cast<PowerupType>(randomPowerup);
 	}
@@ -247,7 +247,7 @@ void Game::DrawPowerUp(PowerupType powerup, int x, int y, bool isShadow)
 	case BlockBomb:
 		DrawTexture(BombPowerup, x, y, color);
 		break;
-	case BlockLineBombUp:
+	//case BlockLineBombUp:
 	case BlockLineBombRight:
 	case BlockLineBombDown:
 	case BlockLineBombLeft:
@@ -777,14 +777,14 @@ void Game::LockBlock()
 			sandBlocksLocked = 0;
 			return;
 		}
-		else if (currentBlock.powerup == BlockLineBombLeft || currentBlock.powerup == BlockLineBombRight || currentBlock.powerup == BlockLineBombUp || currentBlock.powerup == BlockLineBombDown)
+		else if (currentBlock.powerup == BlockLineBombLeft || currentBlock.powerup == BlockLineBombRight || currentBlock.powerup == BlockLineBombDown) //|| currentBlock.powerup == BlockLineBombUp
 		{
 			Position direction{ 0, 0 };
 			switch (currentBlock.powerup)
 			{
-			case BlockLineBombUp:
-				direction.row = -1;
-				break;
+			//case BlockLineBombUp:
+			//	direction.row = -1;
+			//	break;
 			case BlockLineBombRight:
 				direction.column = 1;
 				break;

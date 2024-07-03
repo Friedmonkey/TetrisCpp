@@ -2,7 +2,6 @@
 
 enum PowerupType
 {
-	BlockLineBombUp,
 	BlockLineBombRight,
 	BlockLineBombDown,
 	BlockLineBombLeft,
@@ -15,4 +14,4 @@ enum PowerupType
 
 };
 
-#define AmountPowerups 10
+#define AmountPowerups 9
