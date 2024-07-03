@@ -702,6 +702,163 @@ bool Game::SRSRotateLeft(Block* pBlock)
 	return success;
 }
 
+void Game::PowerupMagic(std::vector<Position> &tiles)
+{
+	std::vector<int> uniqueColumns = std::vector<int>();
+	for (Position item : tiles)
+	{
+		if (std::find(uniqueColumns.begin(), uniqueColumns.end(), item.column) == uniqueColumns.end())
+		{
+			uniqueColumns.push_back(item.column);
+		}
+		grid.grid[item.row][item.column] = currentBlock.id;
+		grid.powerups[item.row][item.column] = currentBlock.powerup;
+	}
+	// Drop blocks down to fill gaps
+	for (int col : uniqueColumns)
+	{
+		int emptyRow = Rows - 1; // Start from bottom of the grid
+
+		for (int row = Rows - 1; row >= 0; --row)
+		{
+			if (grid.grid[row][col] != 0)
+			{
+				// Move block down to the first empty row found
+				if (row != emptyRow)
+				{
+					grid.grid[emptyRow][col] = grid.grid[row][col];
+					grid.powerups[emptyRow][col] = grid.powerups[row][col];
+					grid.grid[row][col] = 0;
+					grid.powerups[row][col] = BlockNormal;
+				}
+				emptyRow--;
+			}
+		}
+	}
+}
+void Game::PowerupSand(std::vector<Position>& tiles)
+{
+	// Sort the vector using std::sort and the custom comparator
+	std::sort(tiles.begin(), tiles.end(), [](Position& a, Position& b) { return a.row > b.row; });
+
+	currentBlocks = std::vector<Block>();
+	for (auto tile : tiles)
+	{
+		Block tileBlock = DBlock();
+		tileBlock.rowOffset = tile.row;
+		tileBlock.colummnOffset = tile.column;
+		tileBlock.id = currentBlock.id;
+		tileBlock.powerup = currentBlock.powerup;
+		currentBlocks.push_back(tileBlock);
+	}
+	sandBlockSplitted = true;
+	sandBlocksLocked = 0;
+}
+void Game::PowerupLineBomb(std::vector<Position>& tiles)
+{
+	Position direction{ 0, 0 };
+	switch (currentBlock.powerup)
+	{
+		//case BlockLineBombUp:
+		//	direction.row = -1;
+		//	break;
+	case BlockLineBombRight:
+		direction.column = 1;
+		break;
+	case BlockLineBombDown:
+		direction.row = 1;
+		break;
+	case BlockLineBombLeft:
+		direction.column = -1;
+		break;
+	}
+	std::vector<Position> poses;
+	std::vector<int> rows;
+
+	for (Position item : tiles)
+	{
+		Position pos{ item.row, item.column };
+		while (!grid.IsCellOutside(pos.row, pos.column))
+		{
+			grid.grid[pos.row][pos.column] = 0;
+			grid.powerups[pos.row][pos.column] = BlockNormal;
+
+			if (currentBlock.powerup == BlockLineBombLeft || currentBlock.powerup == BlockLineBombRight)
+			{
+				auto indexer = std::find(rows.begin(), rows.end(), pos.row);
+				int index = indexer - rows.begin();
+				if (indexer == rows.end())
+				{
+					rows.push_back(pos.row);
+				}
+			}
+
+			if (std::find(poses.begin(), poses.end(), pos) == poses.end())
+			{
+				poses.push_back(pos);
+			}
+
+			pos.row += direction.row;
+			pos.column += direction.column;
+		}
+	}
+
+	float linesCleared = poses.size() / 10.0f;
+	ApplyClearPoints(linesCleared);
+
+	// Drop blocks down to fill gaps
+	for (int col = 0; col < Columns; ++col)
+	{
+		int emptyRow = Rows - 1; // Start from bottom of the grid
+
+		for (int row = Rows - 1; row >= 0; --row)
+		{
+			bool moveZero = true;
+			if (!(std::find(rows.begin(), rows.end(), row) == rows.end()))
+			{
+				//if this row does not exist, we dont move zero
+				moveZero = false;
+			}
+			if (grid.grid[row][col] != 0 || moveZero)
+			{
+				// Move block down to the first empty row found
+				if (row != emptyRow)
+				{
+					grid.grid[emptyRow][col] = grid.grid[row][col];
+					grid.powerups[emptyRow][col] = grid.powerups[row][col];
+					grid.grid[row][col] = 0;
+					grid.powerups[row][col] = BlockNormal;
+				}
+				emptyRow--;
+			}
+		}
+	}
+}
+void Game::PowerupExplosion(std::vector<Position>& tiles)
+{
+	std::vector<Position> totalTnt = std::vector<Position>();
+	for (Position pos : tiles)
+	{
+		std::vector<Position> connectedTNT = grid.FindConnectedTNT(pos.row, pos.column, BlockBomb);
+		// Perform action with connected TNT blocks, such as triggering explosions
+		for (Position tntPos : connectedTNT) {
+			totalTnt.push_back(tntPos);
+			// Trigger the explosion of TNT block at tntPos
+			grid.powerups[tntPos.row][tntPos.column] = BlockNormal;  // Remove the TNT block powerup
+			grid.grid[tntPos.row][tntPos.column] = 0;  // Optionally, clear the grid cell
+			// Add further effects or scoring logic here if needed
+		}
+	}
+	std::cout << "Blew up: " << totalTnt.size() << " tnt's" << std::endl;
+
+	//check if its next to tnt blocks, and get the position of all of those tnt blocks
+	// so we can count the amount and blow them up
+	for (Position item : tiles)
+	{
+		grid.grid[item.row][item.column] = currentBlock.id;
+		grid.powerups[item.row][item.column] = currentBlock.powerup;
+	}
+}
 
 void Game::LockBlock()
 {
@@ -709,187 +866,30 @@ void Game::LockBlock()
 
 	if (!sandBlockSplitted)
 	{
-
-		if (currentBlock.powerup == BlockMagic)
+		switch (currentBlock.powerup)
 		{
-			std::vector<int> uniqueColumns = std::vector<int>();
-			for (Position item : tiles)
-			{
-				if (std::find(uniqueColumns.begin(), uniqueColumns.end(), item.column) == uniqueColumns.end())
-				{
-					uniqueColumns.push_back(item.column);
-				}
-				grid.grid[item.row][item.column] = currentBlock.id;
-				grid.powerups[item.row][item.column] = currentBlock.powerup;
-			}
-			// Drop blocks down to fill gaps
-			for (int col : uniqueColumns)
-			{
-				int emptyRow = Rows - 1; // Start from bottom of the grid
-
-				for (int row = Rows - 1; row >= 0; --row)
-				{
-					if (grid.grid[row][col] != 0)
-					{
-						// Move block down to the first empty row found
-						if (row != emptyRow)
-						{
-							grid.grid[emptyRow][col] = grid.grid[row][col];
-							grid.powerups[emptyRow][col] = grid.powerups[row][col];
-							grid.grid[row][col] = 0;
-							grid.powerups[row][col] = BlockNormal;
-						}
-						emptyRow--;
-					}
-				}
-			}
-			//PowerupType powerup{ BlockNormal };
-			//int randomPowerup = GetRandomValue(0, AmountPowerups);
-			//if (randomPowerup <= AmountPowerups+4)
-			//{
-			//	powerup = static_cast<PowerupType>(randomPowerup);
-			//}
-			//else
-			//{
-			//	powerup = BlockSand;
-			//}
-
-			//currentBlock.powerup = powerup;
-			//std::cout << "turned into: " << powerup << std::endl;
-			//Draw();
-		}
-		else if (currentBlock.powerup == BlockSand)
-		{
-			// Sort the vector using std::sort and the custom comparator
-			std::sort(tiles.begin(), tiles.end(), [](Position& a, Position& b) { return a.row > b.row; });
-
-			currentBlocks = std::vector<Block>();
-			for (auto tile : tiles)
-			{
-				Block tileBlock = DBlock();
-				tileBlock.rowOffset = tile.row;
-				tileBlock.colummnOffset = tile.column;
-				tileBlock.id = currentBlock.id;
-				tileBlock.powerup = currentBlock.powerup;
-				currentBlocks.push_back(tileBlock);
-			}
-			sandBlockSplitted = true;
-			sandBlocksLocked = 0;
+		case BlockMagic:
+			PowerupMagic(tiles);
+			break;
+		case BlockSand:
+			PowerupSand(tiles);
 			return;
-		}
-		else if (currentBlock.powerup == BlockLineBombLeft || currentBlock.powerup == BlockLineBombRight || currentBlock.powerup == BlockLineBombDown) //|| currentBlock.powerup == BlockLineBombUp
-		{
-			Position direction{ 0, 0 };
-			switch (currentBlock.powerup)
-			{
-			//case BlockLineBombUp:
-			//	direction.row = -1;
-			//	break;
-			case BlockLineBombRight:
-				direction.column = 1;
-				break;
-			case BlockLineBombDown:
-				direction.row = 1;
-				break;
-			case BlockLineBombLeft:
-				direction.column = -1;
-				break;
-			}
-			std::vector<Position> poses;
-			std::vector<int> rows;
-
-			for (Position item : tiles)
-			{
-				Position pos{ item.row, item.column };
-				while (!grid.IsCellOutside(pos.row, pos.column))
+		//case BlockLineBombUp:
+		case BlockLineBombDown:
+		case BlockLineBombLeft:
+		case BlockLineBombRight:
+			PowerupLineBomb(tiles);
+			break;
+		case BlockFire:
+			PowerupExplosion(tiles);
+			break;
+		default:
+				for (Position item : tiles)
 				{
-					grid.grid[pos.row][pos.column] = 0;
-					grid.powerups[pos.row][pos.column] = BlockNormal;
-
-					if (currentBlock.powerup == BlockLineBombLeft || currentBlock.powerup == BlockLineBombRight)
-					{
-						auto indexer = std::find(rows.begin(), rows.end(), pos.row);
-						int index = indexer - rows.begin();
-						if (indexer == rows.end())
-						{
-							rows.push_back(pos.row);
-						}
-					}
-
-					if (std::find(poses.begin(), poses.end(), pos) == poses.end())
-					{
-						poses.push_back(pos);
-					}
-
-					pos.row += direction.row;
-					pos.column += direction.column;
+					grid.grid[item.row][item.column] = currentBlock.id;
+					grid.powerups[item.row][item.column] = currentBlock.powerup;
 				}
-			}
-
-			float linesCleared = poses.size() / 10.0f;
-			ApplyClearPoints(linesCleared);
-
-			// Drop blocks down to fill gaps
-			for (int col = 0; col < Columns; ++col)
-			{
-				int emptyRow = Rows - 1; // Start from bottom of the grid
-
-				for (int row = Rows - 1; row >= 0; --row)
-				{
-					bool moveZero = true;
-					if (!(std::find(rows.begin(), rows.end(), row) == rows.end()))
-					{
-						//if this row does not exist, we dont move zero
-						moveZero = false;
-					}
-					if (grid.grid[row][col] != 0 || moveZero)
-					{
-						// Move block down to the first empty row found
-						if (row != emptyRow)
-						{
-							grid.grid[emptyRow][col] = grid.grid[row][col];
-							grid.powerups[emptyRow][col] = grid.powerups[row][col];
-							grid.grid[row][col] = 0;
-							grid.powerups[row][col] = BlockNormal;
-						}
-						emptyRow--;
-					}
-				}
-			}
-		}
-
-		else if (currentBlock.powerup == BlockFire)
-		{
-			std::vector<Position> totalTnt = std::vector<Position>();
-			for (Position pos : tiles)
-			{
-				std::vector<Position> connectedTNT = grid.FindConnectedTNT(pos.row, pos.column, BlockBomb);
-				// Perform action with connected TNT blocks, such as triggering explosions
-				for (Position tntPos : connectedTNT) {
-					totalTnt.push_back(tntPos);
-					// Trigger the explosion of TNT block at tntPos
-					grid.powerups[tntPos.row][tntPos.column] = BlockNormal;  // Remove the TNT block powerup
-					grid.grid[tntPos.row][tntPos.column] = 0;  // Optionally, clear the grid cell
-					// Add further effects or scoring logic here if needed
-				}
-			}
-			std::cout << "Blew up: " << totalTnt.size() << " tnt's" << std::endl;
-
-			//check if its next to tnt blocks, and get the position of all of those tnt blocks
-			// so we can count the amount and blow them up
-			for (Position item : tiles)
-			{
-				grid.grid[item.row][item.column] = currentBlock.id;
-				grid.powerups[item.row][item.column] = currentBlock.powerup;
-			}
-		}
-		else
-		{
-			for (Position item : tiles)
-			{
-				grid.grid[item.row][item.column] = currentBlock.id;
-				grid.powerups[item.row][item.column] = currentBlock.powerup;
-			}
+			break;
 		}
 	}
 	else

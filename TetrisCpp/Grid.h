@@ -13,7 +13,6 @@ public:
 	bool IsCellEmpty(int row, int column);
 	void MoveColumnDown(int column, int startIndex, int amount);
 	int ClearFullRows();
-	int LineClearBombRows(std::vector<int> rows);
 	int grid[Rows][Columns];
 	PowerupType powerups[Rows][Columns];
 	std::vector<Position> FindConnectedTNT(int startRow, int startColumn, PowerupType targetPowerup);

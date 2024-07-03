@@ -47,6 +47,10 @@ private:
 	void DrawBlockUI(Block* pBlock, int offX, int offY);
 	void DrawPowerUp(PowerupType powerup, int x, int y, bool isShadow);
 
+	void PowerupMagic(std::vector<Position> &tiles);
+	void PowerupSand(std::vector<Position> &tiles);
+	void PowerupLineBomb(std::vector<Position> &tiles);
+	void PowerupExplosion(std::vector<Position> &tiles);
 
 	bool IsBlockOutside(Block* pBlock);
 	bool BlockFits(Block* pBlock);
