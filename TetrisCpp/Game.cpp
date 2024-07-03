@@ -421,7 +421,14 @@ void Game::HandleInput()
 {
 	int keyPressed = GetKeyPressed();
 
-
+	if (keyPressed == KEY_L)
+	{
+		currentBlock.powerup = BlockLineBombLeft;
+	}
+	if (keyPressed == KEY_R)
+	{
+		currentBlock.powerup = BlockLineBombRight;
+	}
 	if (keyPressed == KEY_B)
 	{
 		currentBlock.powerup = BlockBomb;
@@ -738,7 +745,7 @@ void Game::LockBlock()
 		}
 		else if (currentBlock.powerup == BlockLineBombLeft || currentBlock.powerup == BlockLineBombRight || currentBlock.powerup == BlockLineBombUp || currentBlock.powerup == BlockLineBombDown)
 		{
-			Position direction {0, 0};
+			Position direction{ 0, 0 };
 			switch (currentBlock.powerup)
 			{
 			case BlockLineBombUp:
@@ -752,31 +759,76 @@ void Game::LockBlock()
 				break;
 			case BlockLineBombLeft:
 				direction.column = -1;
+				break;
 			}
-			std::vector<Position> poses = std::vector<Position>();
+			std::vector<Position> poses;
+			std::vector<int> cols;
+			std::vector<int> rows;
+			std::vector<int> amounts;
+
 			for (Position item : tiles)
 			{
-				Position pos {item.row, item.column};
+				Position pos{ item.row, item.column };
 				while (!grid.IsCellOutside(pos.row, pos.column))
 				{
-					if (grid.grid[pos.row][pos.column] != 0)
-					{
-						grid.grid[pos.row][pos.column] = 0;
-						grid.powerups[pos.row][pos.column] = BlockNormal;
+					grid.grid[pos.row][pos.column] = 0;
+					grid.powerups[pos.row][pos.column] = BlockNormal;
 
-						if (!(std::find(poses.begin(), poses.end(), pos) != poses.end()))
+					if (currentBlock.powerup == BlockLineBombLeft || currentBlock.powerup == BlockLineBombRight)
+					{
+						auto indexer = std::find(cols.begin(), cols.end(), pos.column);
+						int index = indexer - cols.begin();
+						if (indexer == cols.end())
 						{
-							poses.push_back(pos);
+							cols.push_back(pos.column);
+							rows.push_back(pos.row);
+							amounts.push_back(1);
 						}
+						else
+						{
+							if (index < cols.size())
+							{
+								amounts.at(index)++;
+							}
+						}
+					}
+
+					if (std::find(poses.begin(), poses.end(), pos) == poses.end())
+					{
+						poses.push_back(pos);
 					}
 
 					pos.row += direction.row;
 					pos.column += direction.column;
 				}
 			}
-			float linesCleared = poses.size()/10;
+
+			float linesCleared = poses.size() / 10.0f;
 			ApplyClearPoints(linesCleared);
+
+			// Drop blocks down to fill gaps
+			for (int col = 0; col < Columns; ++col)
+			{
+				int emptyRow = Rows - 1; // Start from bottom of the grid
+
+				for (int row = Rows - 1; row >= 0; --row)
+				{
+					if (grid.grid[row][col] != 0)
+					{
+						// Move block down to the first empty row found
+						if (row != emptyRow)
+						{
+							grid.grid[emptyRow][col] = grid.grid[row][col];
+							grid.powerups[emptyRow][col] = grid.powerups[row][col];
+							grid.grid[row][col] = 0;
+							grid.powerups[row][col] = BlockNormal;
+						}
+						emptyRow--;
+					}
+				}
+			}
 		}
+
 		else if (currentBlock.powerup == BlockFire)
 		{
 			std::vector<Position> totalTnt = std::vector<Position>();

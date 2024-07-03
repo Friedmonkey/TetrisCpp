@@ -11,6 +11,7 @@ public:
 	void Draw();
 	bool IsCellOutside(int row, int column);
 	bool IsCellEmpty(int row, int column);
+	void MoveColumnDown(int column, int startIndex, int amount);
 	int ClearFullRows();
 	int LineClearBombRows(std::vector<int> rows);
 	int grid[Rows][Columns];

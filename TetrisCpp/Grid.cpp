@@ -119,6 +119,18 @@ void Grid::MoveRowDown(int row, int amount)
 	}
 }
 
+void Grid::MoveColumnDown(int column, int startIndex, int amount)
+{
+	for (size_t row = Rows; row > startIndex; row--)
+	{
+		grid[row + amount][column] = grid[row][column];
+		grid[row][column] = 0;
+
+		powerups[row + amount][column] = powerups[row][column];
+		powerups[row][column] = BlockNormal;
+	}
+}
+
 
 void Grid::Initialize()
 {
