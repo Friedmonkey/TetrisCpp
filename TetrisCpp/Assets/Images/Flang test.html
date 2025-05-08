@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<!-- saved from url=(0081)http://localhost/weblessen/leerjaar3/flangapi/old/index2.flang?text=hello%20world -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flang test</title>
+	            <script>            	async function readFile2()
+            	{                    var __request = GENERATED_JS_readFile2();
+                    var __output = document.getElementById("readFile2");                    var __response = await __request;
+                    __output.innerHTML = __response;            	}            </script>            <script>            	async function GENERATED_JS_readFile()
+            	{
+            		var url = "/weblessen/leerjaar3/flangapi/old/index2.flang?text=hello%20world&clientEvent=readFile";
+
+
+                    // Data to be sent in the POST request
+                    const postData = new URLSearchParams();                    
+                    // Making the fetch request
+                    let response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: postData.toString()
+                    })
+                    
+                    // Get the response body
+                    let responseData = await response.text();
+                    return responseData;
+            	}            	async function GENERATED_JS_writeFile()
+            	{
+            		var url = "/weblessen/leerjaar3/flangapi/old/index2.flang?text=hello%20world&clientEvent=writeFile";
+
+
+                    // Data to be sent in the POST request
+                    const postData = new URLSearchParams();                    
+                    // Making the fetch request
+                    let response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: postData.toString()
+                    })
+                    
+                    // Get the response body
+                    let responseData = await response.text();
+                    return responseData;
+            	}            	async function GENERATED_JS_readFile2()
+            	{
+            		var url = "/weblessen/leerjaar3/flangapi/old/index2.flang?text=hello%20world&clientEvent=readFile2";
+
+
+                    // Data to be sent in the POST request
+                    const postData = new URLSearchParams();                    
+                    // Making the fetch request
+                    let response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: postData.toString()
+                    })
+                    
+                    // Get the response body
+                    let responseData = await response.text();
+                    return responseData;
+            	}            </script>
+	<script>
+		var input;
+		var input2;
+		document.addEventListener('DOMContentLoaded', function() { const BIND_REF_input = document.getElementById('BIND_input'); function BIND_updateinput() { input = BIND_REF_input.value;} BIND_updateinput(); BIND_REF_input.addEventListener('input', BIND_updateinput); });;
+		document.addEventListener('DOMContentLoaded', function() { const BIND_REF_input2 = document.getElementById('BIND_input2'); function BIND_updateinput2() { input2 = BIND_REF_input2.value;} BIND_updateinput2(); BIND_REF_input2.addEventListener('input', BIND_updateinput2); });;
+	</script>
+</head>
+<body>
+	<br>
+	type ?text=[your text here]
+	in the url to set the text to write!
+	<br>
+	<input id="BIND_input">
+	<button onclick="getvalue(input)">get value</button>
+	<br>
+	<input id="BIND_input2">
+	<button onclick="getvalue(input2)">get value2</button>
+	<br>
+	<button onclick="GENERATED_JS_writeFile()">Write text</button>
+	<br>
+	<button onclick="readFile2()">Read text2</button>
+
+	            <div id="readFile2">             
+		hello world 
+	
+            </div><button onclick="readFile()">Read text</button>
+	<p id="output">hello world</p>
+	<script>
+		function getvalue(val)
+		{
+			alert(val);
+		}
+		async function readFile()
+		{
+			var content = await GENERATED_JS_readFile();
+			var outputElement = document.getElementById("output");
+			outputElement.innerText = content;
+		}
+	</script>
+
+
+
+
+
+            
+
+</body></html>

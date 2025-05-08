@@ -164,8 +164,17 @@ Block Game::GetRandomBlock()
 		if (randomPowerup == 2) //its a line clear block, now get a direction
 		{
 			randomPowerup = GetRandomValue(0,2);
+
+			if (GetRandomValue(0,4) == 2) 
+			{ //small chance for line clear to become sand because thats much more creative than line clear
+				randomPowerup = 8;
+			}
 		}
 		powerup = static_cast<PowerupType>(randomPowerup);
+	}
+	if (block.id == 8 && powerup == BlockSand) //if its square sand (has no use)
+	{
+		powerup = BlockMagic; //give a better version of it
 	}
 
 	block.powerup = powerup;
@@ -892,7 +901,7 @@ void Game::PowerupExplosion(std::vector<Position> &tiles)
 
 	//check if its next to tnt blocks, and get the position of all of those tnt blocks
 	// so we can count the amount and blow them up
-	if (totalTnt.size() < 0)
+	if (totalTnt.size() <= 0)
 	{	//if we didnt blow up any tnt's we will put the fire on the grid
 		for (Position item : tiles)
 		{
